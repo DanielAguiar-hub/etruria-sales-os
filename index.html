@@ -689,12 +689,6 @@ const STRATEGIES = [
         text: (name, shop, region, kit) => `Oi, ${name}! 😊 \n\nImagino que a rotina na ${shop} esteja super corrida. \n\nSó passando para saber se você conseguiu ver o catálogo que te mandei. O objetivo é garantir que você receba os produtos antes que a fábrica pause os pedidos pelo pico do frio. \n\nAlguma dúvida ou algo que eu possa te ajudar agora? 🤝`
     },
     { 
-        id: 'consultoria', 
-        label: '💎 CONSULTIVO (Premium)', 
-        icon: 'fas fa-crown',
-        text: (name, shop, region, kit) => `Oi, ${name}, tudo bem? 🤝\n\nSou o Daniel e cuido da parte comercial da Etruria em ${region}. \n\nBusco parceiros que, assim como a ${shop}, prezam pela confiança e qualidade no atendimento. Acredito que nossa linha Premium (Mantas e Edredons) encaixa perfeitamente no seu público. \n\nPodemos agendar 5 min para eu te apresentar nosso modelo consultivo?\n\nDetalhes aqui: ${kit}`
-    },
-    { 
         id: 'coldcall', 
         label: '📞 COLD CALL (Aquecimento)', 
         icon: 'fas fa-phone-volume',
@@ -1214,19 +1208,24 @@ function renderRouteList() {
     const leads = getLeads();
     const regionFilter = document.getElementById('routeRegionFilter');
     const list = document.getElementById('routeList');
-    
-    // Populate regions dropdown if empty
+    if (!regionFilter || !list) return;
+
+    // Normalização e deduplicação de regiões
     const regions = [...new Set(leads.map(l => {
         const match = l.name.match(/\(([^)]+)\)/);
-        return match ? match[1] : null;
-    }).filter(r => r))].sort();
-    
-    if (regionFilter.options.length <= 1) {
+        return match ? match[1].trim() : null;
+    }).filter(r => r))].sort((a, b) => a.localeCompare(b));
+
+    // Refaz o dropdown se o número de regiões mudou ou se está vazio
+    const currentVal = regionFilter.value;
+    if (regionFilter.options.length <= 1 || regions.length !== (regionFilter.options.length - 1)) {
+        regionFilter.innerHTML = '<option value="">Selecione uma Região / Bairro</option>';
         regions.forEach(r => {
             const opt = document.createElement('option');
             opt.value = r; opt.textContent = r;
             regionFilter.appendChild(opt);
         });
+        regionFilter.value = currentVal; // Mantém a seleção se ainda existir
     }
 
     const selectedRegion = regionFilter.value;
