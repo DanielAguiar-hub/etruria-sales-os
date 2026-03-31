@@ -3,712 +3,1114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etruria — Parceria E-commerce Premium</title>
+    <title>Etruria CRM — Gestão de Parceiros E-commerce</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+    <link rel="apple-touch-icon" href="app_icon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
-            --primary: #1a1a2e;
-            --primary-light: #16213e;
-            --accent: #e94560;
-            --accent-glow: rgba(233, 69, 96, 0.3);
-            --gold: #f0c040;
-            --gold-glow: rgba(240, 192, 64, 0.25);
-            --success: #0f9b58;
-            --surface: #0f3460;
-            --surface-light: rgba(15, 52, 96, 0.6);
-            --text: #e8e8e8;
-            --text-muted: #a0a0b8;
-            --gradient-hero: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-            --gradient-accent: linear-gradient(135deg, #e94560, #ff6b6b);
-            --gradient-gold: linear-gradient(135deg, #f0c040, #f7d774);
-            --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            --radius: 16px;
-            --radius-sm: 10px;
-            --shadow: 0 8px 32px rgba(0,0,0,0.3);
-            --shadow-lg: 0 16px 64px rgba(0,0,0,0.4);
+            --bg: #0d1117; --bg-card: #161b22; --bg-card-hover: #1c2333;
+            --border: #30363d; --border-light: #484f58;
+            --text: #e6edf3; --text-muted: #8b949e; --text-dim: #6e7681;
+            --accent: #e94560; --accent-bg: rgba(233,69,96,0.12);
+            --blue: #58a6ff; --blue-bg: rgba(88,166,255,0.12);
+            --green: #3fb950; --green-bg: rgba(63,185,80,0.12);
+            --yellow: #d29922; --yellow-bg: rgba(210,153,34,0.12);
+            --purple: #bc8cff; --purple-bg: rgba(188,140,255,0.12);
+            --orange: #f0883e; --orange-bg: rgba(240,136,62,0.12);
+            --radius: 12px; --radius-sm: 8px;
         }
-
         html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--primary);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ===== LAYOUT ===== */
+        .app { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 260px; background: var(--bg-card); border-right: 1px solid var(--border);
+            padding: 20px 0; display: flex; flex-direction: column; position: fixed;
+            top: 0; bottom: 0; left: 0; z-index: 50;
+            transition: transform 0.3s;
+        }
+        .sidebar-brand {
+            padding: 0 20px 20px; border-bottom: 1px solid var(--border);
+            font-weight: 800; font-size: 1.1rem; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-brand i { color: var(--accent); }
+        .sidebar-nav { padding: 12px 0; flex: 1; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+            color: var(--text-muted); text-decoration: none; font-size: 0.9rem;
+            font-weight: 500; transition: all 0.2s; border-left: 3px solid transparent;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            color: var(--text); background: rgba(255,255,255,0.04);
+            border-left-color: var(--accent);
+        }
+        .sidebar-nav a i { width: 20px; text-align: center; font-size: 0.95rem; }
+        .sidebar-stats {
+            padding: 16px 20px; border-top: 1px solid var(--border);
+            font-size: 0.8rem; color: var(--text-dim);
+        }
+        .main { margin-left: 260px; flex: 1; padding: 24px; min-width: 0; }
+
+        @media(max-width:768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .mobile-toggle { display: flex !important; }
+        }
+        .mobile-toggle {
+            display: none; position: fixed; top: 12px; left: 12px; z-index: 60;
+            width: 40px; height: 40px; border-radius: var(--radius-sm);
+            background: var(--bg-card); border: 1px solid var(--border);
+            align-items: center; justify-content: center; cursor: pointer;
+            color: var(--text); font-size: 1.2rem;
         }
 
-        /* Animated background particles */
-        .particles {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 0; overflow: hidden;
+        /* ===== HEADER ===== */
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
         }
-        .particle {
-            position: absolute; border-radius: 50%;
-            background: radial-gradient(circle, var(--accent-glow), transparent);
-            animation: float-particle linear infinite;
-        }
-        @keyframes float-particle {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-        }
+        .page-title { font-size: 1.5rem; font-weight: 800; }
+        .header-actions { display: flex; gap: 10px; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+            border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; border: 1px solid var(--border); background: var(--bg-card);
+            color: var(--text); transition: all 0.2s; font-family: inherit;
+        }
+        .btn:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .btn-primary:hover { filter: brightness(1.15); }
+        .btn-success { background: var(--green); border-color: var(--green); color: #fff; }
 
-        /* ===== HERO ===== */
-        .hero {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: var(--gradient-hero); position: relative; text-align: center;
-            padding: 80px 24px;
+        /* ===== KPI Cards ===== */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 20px; display: flex; align-items: center; gap: 16px;
+            transition: all 0.3s;
         }
-        .hero::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
-            background: linear-gradient(to top, var(--primary), transparent);
+        .kpi-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+        .kpi-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(233, 69, 96, 0.15); border: 1px solid rgba(233, 69, 96, 0.3);
-            padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 600;
-            color: var(--accent); margin-bottom: 24px; letter-spacing: 1px; text-transform: uppercase;
-            animation: pulse-badge 2s ease-in-out infinite;
-        }
-        @keyframes pulse-badge {
-            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
-            50% { box-shadow: 0 0 20px 5px var(--accent-glow); }
-        }
-        .hero h1 {
-            font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 900; line-height: 1.1;
-            margin-bottom: 20px; letter-spacing: -1px;
-        }
-        .hero h1 span { background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero-subtitle {
-            font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-muted);
-            max-width: 700px; margin: 0 auto 40px; font-weight: 300;
-        }
-        .hero-stats {
-            display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
-            position: relative; z-index: 2;
-        }
-        .hero-stat {
-            text-align: center; padding: 20px; background: var(--gradient-card);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius);
-            min-width: 160px; backdrop-filter: blur(10px);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .hero-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-        .hero-stat .number {
-            font-size: 2.5rem; font-weight: 800; display: block;
-            background: var(--gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .hero-stat .label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        .kpi-value { font-size: 1.6rem; font-weight: 800; }
+        .kpi-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .cta-btn {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--gradient-accent); color: #fff; border: none;
-            padding: 16px 36px; border-radius: 50px; font-size: 1.05rem; font-weight: 700;
-            cursor: pointer; text-decoration: none; letter-spacing: 0.5px;
-            transition: all 0.3s; box-shadow: 0 4px 20px var(--accent-glow);
-            margin-top: 32px; position: relative; z-index: 2;
+        /* ===== FUNNEL ===== */
+        .funnel-board {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+            margin-bottom: 24px; overflow-x: auto;
         }
-        .cta-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 30px var(--accent-glow); }
+        @media(max-width:1100px) { .funnel-board { grid-template-columns: repeat(3, 1fr); } }
+        @media(max-width:640px) { .funnel-board { grid-template-columns: 1fr; } }
+        .funnel-column {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            min-height: 300px; display: flex; flex-direction: column;
+        }
+        .funnel-header {
+            padding: 14px 16px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .funnel-count {
+            background: rgba(255,255,255,0.08); padding: 2px 10px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .funnel-body { padding: 8px; flex: 1; min-height: 100px; }
 
-        /* ===== SECTIONS ===== */
-        section { padding: 100px 0; position: relative; }
-        .section-label {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; color: var(--accent); margin-bottom: 12px;
-        }
-        .section-title {
-            font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-        .section-desc { color: var(--text-muted); max-width: 600px; margin-bottom: 48px; font-size: 1.05rem; }
-
-        /* ===== POR QUE VENDER ===== */
-        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .reason-card {
-            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius); padding: 32px; position: relative; overflow: hidden;
-            transition: all 0.4s;
-        }
-        .reason-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: var(--gradient-accent); transform: scaleX(0); transform-origin: left;
-            transition: transform 0.4s;
-        }
-        .reason-card:hover::before { transform: scaleX(1); }
-        .reason-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(233,69,96,0.2); }
-        .reason-icon {
-            width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; margin-bottom: 20px;
-        }
-        .reason-icon.red { background: rgba(233,69,96,0.15); color: var(--accent); }
-        .reason-icon.gold { background: rgba(240,192,64,0.15); color: var(--gold); }
-        .reason-icon.green { background: rgba(15,155,88,0.15); color: var(--success); }
-        .reason-icon.blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
-        .reason-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
-        .reason-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
-        .reason-highlight {
-            display: inline-block; background: rgba(233,69,96,0.12); color: var(--accent);
-            font-weight: 700; padding: 2px 8px; border-radius: 4px;
-        }
-
-        /* ===== TOP PRODUTOS ===== */
-        .products-showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .product-card {
-            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius); overflow: hidden; transition: all 0.4s;
+        .lead-card {
+            background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
             position: relative;
         }
-        .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: rgba(240,192,64,0.3); }
-        .product-badge {
-            position: absolute; top: 12px; left: 12px; z-index: 2;
-            background: var(--gradient-gold); color: var(--primary); font-size: 0.7rem;
-            font-weight: 800; padding: 4px 12px; border-radius: 50px; letter-spacing: 0.5px;
+        .lead-card:hover { border-color: var(--accent); background: rgba(233,69,96,0.04); }
+        .lead-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+        .lead-channel {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem;
+            padding: 2px 8px; border-radius: 50px; font-weight: 600;
         }
-        .product-img {
-            width: 100%; height: 180px; object-fit: cover;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            transition: transform 0.5s;
+        .lead-channel.shopee { background: var(--orange-bg); color: var(--orange); }
+        .lead-channel.ml { background: var(--yellow-bg); color: var(--yellow); }
+        .lead-channel.amazon { background: var(--blue-bg); color: var(--blue); }
+        .lead-channel.loja { background: var(--green-bg); color: var(--green); }
+        .lead-channel.instagram { background: var(--purple-bg); color: var(--purple); }
+        .lead-contact { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+        .lead-date { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; }
+        .lead-actions {
+            display: flex; gap: 4px; margin-top: 8px;
         }
-        .product-card:hover .product-img { transform: scale(1.08); }
-        .product-img-wrap { overflow: hidden; }
-        .product-info { padding: 16px; }
-        .product-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-        .product-cat { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; }
-        .product-meta { display: flex; justify-content: space-between; align-items: center; }
-        .product-rating { color: var(--gold); font-size: 0.85rem; font-weight: 600; }
-        .product-volume { color: var(--success); font-size: 0.8rem; font-weight: 600; }
+        .lead-action-btn {
+            flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: 6px;
+            background: transparent; color: var(--text-muted); cursor: pointer;
+            font-size: 0.75rem; transition: all 0.2s; font-family: inherit;
+        }
+        .lead-action-btn:hover { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+        .lead-action-btn.del:hover { background: rgba(248,81,73,0.12); color: #f85149; border-color: #f85149; }
 
-        /* ===== CALCULADORA ===== */
-        .calc-section { background: linear-gradient(135deg, rgba(15,52,96,0.4), rgba(26,26,46,0.8)); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); }
-        .calc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 48px; }
-        @media(max-width: 768px) { .calc-container { grid-template-columns: 1fr; padding: 24px; } }
-        .calc-left h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; }
-        .calc-left p { color: var(--text-muted); margin-bottom: 32px; }
-        .calc-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .calc-form select, .calc-form input {
-            width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
-            color: var(--text); font-size: 1rem; font-family: inherit; margin-bottom: 20px;
-            transition: border-color 0.3s; outline: none;
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px); padding: 20px;
         }
-        .calc-form select option { background: var(--primary); }
-        .calc-form select:focus, .calc-form input:focus { border-color: var(--accent); }
-        .calc-btn {
-            width: 100%; padding: 16px; background: var(--gradient-accent); color: #fff;
-            border: none; border-radius: var(--radius-sm); font-size: 1.05rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
         }
-        .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--accent-glow); }
-        .calc-results {
-            display: grid; gap: 16px;
+        .modal-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .calc-result-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: var(--radius-sm); padding: 20px; text-align: center;
-            transition: all 0.3s;
+        .modal-header h3 { font-weight: 700; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text); font-size: 0.9rem;
+            font-family: inherit; outline: none; transition: border-color 0.2s;
         }
-        .calc-result-card.highlight { border-color: var(--gold); background: var(--gold-glow); }
-        .calc-result-card .value { font-size: 1.8rem; font-weight: 800; display: block; }
-        .calc-result-card .value.gold { background: var(--gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .calc-result-card .value.green { color: var(--success); }
-        .calc-result-card .desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+        .form-group select option { background: var(--bg-card); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* ===== DIFERENCIAIS ===== */
-        .diff-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .diff-card {
-            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius); padding: 28px; text-align: center;
-            transition: all 0.4s;
-        }
-        .diff-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
-        .diff-emoji { font-size: 2.5rem; margin-bottom: 16px; display: block; }
-        .diff-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
-        .diff-card p { color: var(--text-muted); font-size: 0.9rem; }
+        /* ===== VIEWS ===== */
+        .view { display: none; }
+        .view.active { display: block; }
 
-        /* ===== DEPOIMENTOS ===== */
-        .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .testimonial-card {
-            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius); padding: 28px; position: relative;
-        }
-        .testimonial-card::before {
-            content: '"'; position: absolute; top: 12px; left: 20px;
-            font-size: 4rem; color: rgba(233,69,96,0.15); font-family: Georgia, serif; line-height: 1;
-        }
-        .testimonial-text { font-style: italic; color: var(--text-muted); margin-bottom: 16px; padding-top: 24px; line-height: 1.7; }
-        .testimonial-stars { color: var(--gold); margin-bottom: 8px; font-size: 0.9rem; }
-        .testimonial-author { font-weight: 700; font-size: 0.9rem; }
-        .testimonial-source { color: var(--text-muted); font-size: 0.8rem; }
+        /* ===== TABLE ===== */
+        .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .table-header h3 { font-weight: 700; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 16px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px 16px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
-        /* ===== CTA FINAL ===== */
-        .cta-final {
-            text-align: center; padding: 100px 24px;
-            background: linear-gradient(135deg, var(--primary-light), var(--surface));
-            border-radius: var(--radius); margin: 60px 0;
-            border: 1px solid rgba(255,255,255,0.06);
+        /* ===== SCRIPTS SECTION ===== */
+        .scripts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .script-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 20px; position: relative;
         }
-        .cta-final h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; margin-bottom: 16px; }
-        .cta-final p { color: var(--text-muted); max-width: 550px; margin: 0 auto 32px; font-size: 1.05rem; }
-        .cta-whatsapp {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: #25d366; color: #fff; padding: 18px 40px;
-            border-radius: 50px; font-size: 1.1rem; font-weight: 700;
-            text-decoration: none; transition: all 0.3s;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+        .script-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+        .script-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: block; }
+        .script-text {
+            background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 14px; font-size: 0.85rem; line-height: 1.7; color: var(--text-muted);
+            white-space: pre-wrap;
         }
-        .cta-whatsapp:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4); }
+        .copy-btn {
+            position: absolute; top: 16px; right: 16px; padding: 6px 12px;
+            background: var(--accent-bg); color: var(--accent); border: none;
+            border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .copy-btn:hover { background: var(--accent); color: #fff; }
 
-        /* ===== FOOTER ===== */
-        footer {
-            text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 0.85rem;
-            border-top: 1px solid rgba(255,255,255,0.06);
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 200;
+            background: var(--green); color: #fff; padding: 12px 20px;
+            border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s;
         }
-
-        /* ===== ANIMATIONS ===== */
-        .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width: 640px) {
-            .hero-stats { gap: 16px; }
-            .hero-stat { min-width: 130px; padding: 14px; }
-            .hero-stat .number { font-size: 1.8rem; }
-            section { padding: 60px 0; }
-            .products-showcase { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .product-img { height: 130px; }
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--primary); }
-        ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-        /* Nav */
-        .topnav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            background: rgba(26, 26, 46, 0.85); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.3s;
-        }
-        .topnav-brand { font-weight: 800; font-size: 1.15rem; letter-spacing: 2px; }
-        .topnav-links { display: flex; gap: 24px; }
-        .topnav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.3s; }
-        .topnav-links a:hover { color: var(--accent); }
-        @media(max-width:640px) { .topnav-links { display: none; } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     </style>
 </head>
 <body>
 
-<!-- Particles Background -->
-<div class="particles" id="particles"></div>
+<div class="app">
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+        <i class="fas fa-bars"></i>
+    </button>
 
-<!-- Navigation -->
-<nav class="topnav">
-    <div class="topnav-brand">ETRURIA</div>
-    <div class="topnav-links">
-        <a href="#porque">Por que Etruria</a>
-        <a href="#produtos">Bestsellers</a>
-        <a href="#calculadora">Calculadora</a>
-        <a href="#diferenciais">Diferenciais</a>
-        <a href="#contato">Contato</a>
-    </div>
-</nav>
-
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container" style="position:relative;z-index:2;">
-        <div class="hero-badge"><i class="fas fa-crown"></i> Parceiro Oficial Etruria</div>
-        <h1>Venda os <span>Cobertores #1</span><br>do Brasil no seu E-commerce</h1>
-        <p class="hero-subtitle">
-            Desde 1973, a Etruria fabrica os cobertores e mantas mais vendidos dos marketplaces brasileiros. 
-            Agora, queremos que o seu e-commerce faça parte dessa história de sucesso.
-        </p>
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <span class="number" data-target="11339">0</span>
-                <span class="label">Unidades vendidas/mês</span>
-            </div>
-            <div class="hero-stat">
-                <span class="number" data-target="4.9" data-decimal="true">0</span>
-                <span class="label">Avaliação média ⭐</span>
-            </div>
-            <div class="hero-stat">
-                <span class="number" data-target="53" data-suffix="+">0</span>
-                <span class="label">Anos de mercado</span>
-            </div>
-            <div class="hero-stat">
-                <span class="number" data-target="85">0</span>
-                <span class="label">Produtos no catálogo</span>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand"><i class="fas fa-rocket"></i> ETRURIA CRM</div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" data-view="dashboard" onclick="switchView('dashboard',this)"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="#" data-view="funnel" onclick="switchView('funnel',this)"><i class="fas fa-filter"></i> Funil de Vendas</a>
+            <a href="#" data-view="leads" onclick="switchView('leads',this)"><i class="fas fa-users"></i> Todos os Leads</a>
+            <a href="#" data-view="scripts" onclick="switchView('scripts',this)"><i class="fas fa-comment-dots"></i> Scripts de Venda</a>
+            <a href="#" id="installBtn" style="display:none; color:var(--green);"><i class="fas fa-download"></i> Instalar App</a>
+        </nav>
+        <div class="sidebar-stats">
+            <p>💾 Dados salvos localmente</p>
+            <p style="margin-top:4px;">Último backup: <span id="lastSave">—</span></p>
         </div>
-        <a href="#calculadora" class="cta-btn">
-            <i class="fas fa-calculator"></i> Calcule Seu Lucro Agora
-        </a>
-    </div>
-</section>
+    </aside>
 
-<!-- Por que vender Etruria -->
-<section id="porque">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-chart-line"></i> Oportunidade de Mercado</div>
-        <h2 class="section-title">Por que seu e-commerce precisa da Etruria?</h2>
-        <p class="section-desc">Os números não mentem. Veja por que os maiores vendedores online do Brasil já trabalham com a gente.</p>
+    <!-- Main Content -->
+    <main class="main">
 
-        <div class="reasons-grid">
-            <div class="reason-card fade-in">
-                <div class="reason-icon red"><i class="fas fa-fire"></i></div>
-                <h3>Demanda Explosiva Comprovada</h3>
-                <p>Mais de <span class="reason-highlight">11.000 unidades/mês</span> vendidas nos principais marketplaces. Não é estimativa — são dados reais de Mercado Livre, Shopee e Amazon.</p>
-            </div>
-            <div class="reason-card fade-in">
-                <div class="reason-icon gold"><i class="fas fa-coins"></i></div>
-                <h3>Margem de Lucro Premium</h3>
-                <p>Trabalhe com margens de <span class="reason-highlight">35% a 50%</span> nos produtos baby e adulto. O ticket médio alto dos cobertores adultos (R$160+) garante lucro mesmo com baixo volume.</p>
-            </div>
-            <div class="reason-card fade-in">
-                <div class="reason-icon green"><i class="fas fa-sync-alt"></i></div>
-                <h3>Alto Giro de Estoque</h3>
-                <p>Produtos baby são presentes de maternidade — vendem o ano inteiro, sem sazonalidade. Seu estoque gira rápido e você repõe com frequência.</p>
-            </div>
-            <div class="reason-card fade-in">
-                <div class="reason-icon blue"><i class="fas fa-star"></i></div>
-                <h3>Nota 4.9★ — Zero Dor de Cabeça</h3>
-                <p>Produtos com avaliação média de <span class="reason-highlight">4.9 estrelas</span>. Menos devoluções, menos reclamações, mais clientes satisfeitos comprando de novo.</p>
-            </div>
-            <div class="reason-card fade-in">
-                <div class="reason-icon red"><i class="fas fa-leaf"></i></div>
-                <h3>Sustentabilidade que Vende</h3>
-                <p>100% feitos com <strong>PET reciclado</strong>. O consumidor moderno paga mais por produtos eco-friendly — e isso diferencia o seu anúncio da concorrência.</p>
-            </div>
-            <div class="reason-card fade-in">
-                <div class="reason-icon gold"><i class="fas fa-shield-alt"></i></div>
-                <h3>100% Antialérgico Certificado</h3>
-                <p>Selo de qualidade <strong>ISO</strong>. Ideal para bebês e pessoas com alergias. Argumento de venda imbatível nos marketplaces de bebê.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Top Produtos -->
-<section id="produtos" style="background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-trophy"></i> Bestsellers Comprovados</div>
-        <h2 class="section-title">Top 10 Produtos Mais Vendidos</h2>
-        <p class="section-desc">Estes são os campeões de venda nos maiores marketplaces. Comece seu estoque por aqui.</p>
-
-        <div class="products-showcase" id="productsGrid">
-            <!-- Populated by JS -->
-        </div>
-    </div>
-</section>
-
-<!-- Calculadora -->
-<section id="calculadora">
-    <div class="container">
-        <div class="calc-section">
-            <div class="calc-container">
-                <div class="calc-left">
-                    <div class="section-label"><i class="fas fa-calculator"></i> Simulador de Lucro</div>
-                    <h2>Calcule Quanto Você Vai Lucrar</h2>
-                    <p>Selecione a linha de produto e a quantidade. Veja em tempo real o retorno do seu investimento.</p>
-                    <div class="calc-form">
-                        <label>Linha de Produto</label>
-                        <select id="calcProduct">
-                            <option value="lille-baby" data-cost="35" data-sell="55">Lille Baby (Baby) — Custo ~R$35 | Venda ~R$55</option>
-                            <option value="baby-flannel" data-cost="33" data-sell="52">Baby Flannel (Baby) — Custo ~R$33 | Venda ~R$52</option>
-                            <option value="baby-class" data-cost="42" data-sell="66">Baby Class (Baby) — Custo ~R$42 | Venda ~R$66</option>
-                            <option value="baby-petit" data-cost="40" data-sell="63">Baby Petit (Baby) — Custo ~R$40 | Venda ~R$63</option>
-                            <option value="bebemanta" data-cost="46" data-sell="72">Bebêmanta (Baby) — Custo ~R$46 | Venda ~R$72</option>
-                            <option value="baby-lovely" data-cost="34" data-sell="54">Baby Lovely (Baby) — Custo ~R$34 | Venda ~R$54</option>
-                            <option value="lille" data-cost="58" data-sell="91">Lille (Adulto) — Custo ~R$58 | Venda ~R$91</option>
-                            <option value="bonno-adulto" data-cost="135" data-sell="210">Bonno Adulto — Custo ~R$135 | Venda ~R$210</option>
-                            <option value="lovely" data-cost="120" data-sell="190">Lovely (Adulto) — Custo ~R$120 | Venda ~R$190</option>
-                            <option value="cobertores" data-cost="100" data-sell="165">Cobertores Premium — Custo ~R$100 | Venda ~R$165</option>
-                        </select>
-
-                        <label>Quantidade Mensal (unidades)</label>
-                        <input type="number" id="calcQty" value="50" min="1" max="10000" placeholder="Ex: 50">
-
-                        <label>Margem de Revenda (%)</label>
-                        <input type="range" id="calcMargin" min="20" max="80" value="40" style="accent-color: var(--accent);">
-                        <div style="text-align: center; color: var(--accent); font-weight: 700; font-size: 1.3rem; margin: -10px 0 20px;">
-                            <span id="marginDisplay">40</span>%
-                        </div>
-
-                        <button class="calc-btn" onclick="calculateProfit()">
-                            <i class="fas fa-chart-bar"></i> Calcular Lucro
-                        </button>
-                    </div>
+        <!-- ===== DASHBOARD VIEW ===== -->
+        <div class="view active" id="view-dashboard">
+            <div class="page-header">
+                <h1 class="page-title">📊 Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn" onclick="exportData()"><i class="fas fa-download"></i> Exportar</button>
+                    <button class="btn" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i> Importar</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="btn btn-success" onclick="loadMainLeads()"><i class="fas fa-sync"></i> Carregar Leads Mapeados</button>
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Novo Lead</button>
                 </div>
-                <div class="calc-results" id="calcResults">
-                    <div class="calc-result-card">
-                        <span class="value" id="resCusto">R$ 0</span>
-                        <span class="desc">Investimento Mensal</span>
-                    </div>
-                    <div class="calc-result-card">
-                        <span class="value" id="resReceita">R$ 0</span>
-                        <span class="desc">Receita Bruta Mensal</span>
-                    </div>
-                    <div class="calc-result-card highlight">
-                        <span class="value gold" id="resLucro">R$ 0</span>
-                        <span class="desc">💰 Lucro Mensal</span>
-                    </div>
-                    <div class="calc-result-card">
-                        <span class="value green" id="resROI">0%</span>
-                        <span class="desc">Retorno sobre Investimento</span>
-                    </div>
-                    <div class="calc-result-card highlight">
-                        <span class="value gold" id="resAnual">R$ 0</span>
-                        <span class="desc">🚀 Projeção Lucro Anual</span>
-                    </div>
-                    <div class="calc-result-card">
-                        <span class="value" id="resTicket">R$ 0</span>
-                        <span class="desc">Lucro por Unidade</span>
-                    </div>
+            </div>
+
+            <div class="kpi-grid" id="kpiGrid"></div>
+
+            <!-- Weather & Status Alert -->
+            <div id="weatherAlert" style="margin-bottom: 24px; padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-card); display: none; align-items: center; gap: 15px;">
+                <div id="weatherIcon" style="font-size: 2rem; color: var(--blue);">❄️</div>
+                <div style="flex: 1;">
+                    <div id="weatherTitle" style="font-weight: 800; font-size: 0.9rem; color: var(--text);">ALERTA DE GIRO: Clima Perfeito para Sazonalidade</div>
+                    <div id="weatherDesc" style="font-size: 0.8rem; color: var(--text-muted);">Temperatura em SP: 16°C. Recomendação: Use o script "Sazonalidade 2.0".</div>
+                </div>
+            </div>
+
+            <!-- BI Dashboard -->
+            <div id="dashboardCharts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div class="table-wrap" style="padding: 20px;">
+                    <h3 style="font-size:0.9rem; margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-chart-pie" style="color:var(--accent);"></i> Performance do Funil</h3>
+                    <div style="height: 250px;"><canvas id="funnelChart"></canvas></div>
+                </div>
+                <div class="table-wrap" style="padding: 20px;">
+                    <h3 style="font-size:0.9rem; margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-map-marked-alt" style="color:var(--blue);"></i> Top Regiões (São Paulo)</h3>
+                    <div style="height: 250px;"><canvas id="regionChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Mini Funnel -->
+            <div class="funnel-board" id="miniFunnel"></div>
+        </div>
+
+        <!-- ===== FUNNEL VIEW ===== -->
+        <div class="view" id="view-funnel">
+            <div class="page-header">
+                <h1 class="page-title">🔄 Funil de Vendas</h1>
+                <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Novo Lead</button>
+            </div>
+            <div class="funnel-board" id="fullFunnel"></div>
+        </div>
+
+        <!-- ===== LEADS VIEW ===== -->
+        <div class="view" id="view-leads">
+            <div class="page-header">
+                <h1 class="page-title">👥 Todos os Leads</h1>
+                <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Novo Lead</button>
+            </div>
+            <div class="table-wrap">
+                <div class="table-header">
+                    <h3>Lista Completa</h3>
+                    <input type="text" id="searchLeads" placeholder="Buscar..." style="padding:8px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:0.85rem;outline:none;width:200px;" oninput="renderLeadsTable()">
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="leadsTable">
+                        <thead>
+                            <tr>
+                                <th>Nome</th><th>Canal</th><th>Status</th><th>Contato</th><th>Última Ação</th><th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Diferenciais -->
-<section id="diferenciais">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-gem"></i> Vantagem Competitiva</div>
-        <h2 class="section-title">O Que Faz a Etruria Imbatível</h2>
-        <p class="section-desc">Não é só um cobertor. É tecnologia, tradição e inovação de 53 anos em cada peça.</p>
+        <!-- ===== SCRIPTS VIEW ===== -->
+        <div class="view" id="view-scripts">
+            <div class="page-header">
+                <h1 class="page-title">💬 Scripts de Abordagem</h1>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card">
+                    <button class="copy-btn" onclick="copyScript(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <h4>❄️ 1. Sazonalidade 2.0 (Urgência)</h4>
+                    <span class="script-label">Foco: Gancho Regional e Antecipação</span>
+                    <div class="script-text">Olá, [NOME]. Tudo bem? 👋
 
-        <div class="diff-grid">
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">🧬</span>
-                <h3>Tecnologia Antialérgica</h3>
-                <p>100% das fibras são hipoalergênicas. Perfeito para bebês, idosos e famílias com sensibilidade.</p>
-            </div>
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">♻️</span>
-                <h3>Feito de PET Reciclado</h3>
-                <p>Cada cobertor recicla garrafas PET. Sustentabilidade que o consumidor moderno exige e paga mais.</p>
-            </div>
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">🏭</span>
-                <h3>Fábrica Própria desde 1973</h3>
-                <p>Não é importado, não é revenda. Produção nacional com controle total de qualidade.</p>
-            </div>
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">🧸</span>
-                <h3>Toque Extra Macio</h3>
-                <p>Tecnologia exclusiva de acabamento. O "toque de seda" que faz o cliente comprar de novo.</p>
-            </div>
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">🎨</span>
-                <h3>85 Estampas & Cores</h3>
-                <p>Catálogo diverso para todos os gostos. De baby delicado a adulto sofisticado.</p>
-            </div>
-            <div class="diff-card fade-in">
-                <span class="diff-emoji">🏆</span>
-                <h3>4.9★ nos Marketplaces</h3>
-                <p>A nota mais alta do segmento. Menos devoluções, mais reputação, mais vendas pro seu e-commerce.</p>
+Acompanho o trabalho da [LOJA] aqui em [REGIÃO] e vi que vocês têm um mix bem legal de produtos. 
+
+Como as temperaturas já vão começar a cair nas próximas semanas, a maioria dos lojistas parceiros já está reforçando o estoque para não perder o pico de vendas de inverno. 
+
+Represento a fábrica da Etruria direto aqui na região. Faz sentido eu te enviar o nosso catálogo rápido por aqui, só para você dar uma olhada nos modelos que dão a maior margem de lucro? 📋</div>
+                </div>
+
+                <div class="script-card">
+                    <button class="copy-btn" onclick="copyScript(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <h4>📈 2. Rentabilidade (Objetivo)</h4>
+                    <span class="script-label">Foco: Giro de Estoque e Lucro</span>
+                    <div class="script-text">Oi, [NOME], bom dia! 👋
+
+Meu nome é Daniel, sou representante comercial direto da fábrica de cobertores Etruria. 
+
+Estou entrando em contato de forma bem objetiva porque lojistas com o perfil da [LOJA] costumam ter um giro de estoque excelente com as nossas linhas, principalmente agora no 2º trimestre. 
+
+Você teria espaço na agenda essa semana para eu te mostrar nossa tabela de preços e como podemos aumentar sua margem de lucro nesse inverno? 💰</div>
+                </div>
+
+                <div class="script-card">
+                    <button class="copy-btn" onclick="copyScript(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <h4>🔁 3. Follow-up (O "Vácuo")</h4>
+                    <span class="script-label">Foco: Acompanhamento e Persistência</span>
+                    <div class="script-text">Oi, [NOME]! 😊
+
+Sei que a rotina na gerência da [LOJA] é bem corrida. Só subindo a mensagem para saber se você conseguiu dar uma olhada no catálogo da Etruria. 
+
+O foco é garantir que você tenha os produtos de maior lucro antes do pico do frio. Alguma dúvida onde eu possa te ajudar? 📋🤝</div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Avaliações -->
-<section style="background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-comments"></i> Prova Social</div>
-        <h2 class="section-title">O Que Dizem os Compradores</h2>
-        <p class="section-desc">Avaliações reais de consumidores nos principais marketplaces.</p>
+    </main>
+</div>
 
-        <div class="testimonials">
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Comprei o Lille Baby Oliva pro meu bebê e é simplesmente PERFEITO. Super macio, quentinho e não dá alergia nenhuma. Já comprei 3 de presente!"</p>
-                <p class="testimonial-author">Maria S.</p>
-                <p class="testimonial-source">Mercado Livre — Verificado</p>
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">Novo Lead</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="leadId">
+            <div class="form-group">
+                <label>Nome da Loja / Empresa *</label>
+                <input type="text" id="leadName" placeholder="Ex: Loja Baby Dreams">
             </div>
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"O Bonno Adulto é absurdo de bom. Parece seda! Comprei um e voltei pra comprar pra casa toda. Melhor cobertor que já tive na vida."</p>
-                <p class="testimonial-author">Ricardo L.</p>
-                <p class="testimonial-source">Amazon — Verificado</p>
+            <div class="form-group">
+                <label>Canal de Venda</label>
+                <select id="leadChannel">
+                    <option value="shopee">Shopee</option>
+                    <option value="ml">Mercado Livre</option>
+                    <option value="amazon">Amazon</option>
+                    <option value="loja">Loja Própria / Site</option>
+                    <option value="instagram">Instagram / TikTok</option>
+                </select>
             </div>
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Vendo na Shopee e adicionei a linha Etruria no meu mix. Virou disparado o produto que mais vende. Reposição toda semana!"</p>
-                <p class="testimonial-author">Lojista Anônimo</p>
-                <p class="testimonial-source">Shopee — Vendedor Parceiro</p>
+            <div class="form-group">
+                <label>Status no Funil</label>
+                <select id="leadStatus">
+                    <option value="lead">🔵 Lead (Novo)</option>
+                    <option value="contato">🟡 Contatado</option>
+                    <option value="proposta">🟠 Proposta Enviada</option>
+                    <option value="pedido">🟢 Pedido Fechado</option>
+                    <option value="recompra">🟣 Recompra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Contato (WhatsApp / Email)</label>
+                <input type="text" id="leadContact" placeholder="Ex: 11 99999-9999 ou email@loja.com">
+            </div>
+            <div class="form-group">
+                <label>Link da Loja</label>
+                <input type="text" id="leadUrl" placeholder="Ex: https://shopee.com.br/lojanome">
+            </div>
+            
+            <!-- Lead Investigator Section -->
+            <div id="researchSection" style="margin-top:20px; padding:15px; background:var(--bg); border:1px dashed var(--border-light); border-radius:var(--radius-sm);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--accent);"><i class="fas fa-search-location"></i> INVESTIGADOR DE LEADS</label>
+                    <span style="font-size:0.65rem; color:var(--text-dim);">Ferramenta de Busca Profunda</span>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="lead-action-btn" onclick="deepSearch('maps')"><i class="fas fa-map-marker-alt"></i> Maps</button>
+                    <button class="lead-action-btn" onclick="deepSearch('insta')"><i class="fab fa-instagram"></i> Instagram</button>
+                    <button class="lead-action-btn" onclick="deepSearch('whats')"><i class="fab fa-whatsapp"></i> WhatsApp Find</button>
+                    <button class="lead-action-btn" onclick="deepSearch('google')"><i class="fab fa-google"></i> Telefone/CNPJ</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:16px;">
+                <label>Observações</label>
+                <textarea id="leadNotes" placeholder="Produtos de interesse, volume estimado, etc."></textarea>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- CTA Final -->
-<section id="contato">
-    <div class="container">
-        <div class="cta-final">
-            <div class="section-label"><i class="fas fa-handshake"></i> Próximo Passo</div>
-            <h2>Pronto para Vender os<br><span style="background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cobertores #1 do Brasil?</span></h2>
-            <p>Fale direto com seu representante Etruria. Pedido mínimo acessível, condições especiais para e-commerce e suporte total para você começar a lucrar.</p>
-            <a href="https://wa.me/5511975768512" target="_blank" class="cta-whatsapp">
-                <i class="fab fa-whatsapp" style="font-size: 1.4rem;"></i> Falar com Representante
-            </a>
-            <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
-                <i class="fas fa-phone-alt"></i> (11) 4718-8700 &nbsp;|&nbsp; 
-                <i class="fas fa-envelope"></i> etruria@etruria.com.br
-            </p>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveLead()"><i class="fas fa-check"></i> Salvar</button>
         </div>
     </div>
-</section>
+</div>
 
-<footer>
-    <p>Etruria Têxtil — Desde 1973 transformando garrafas PET em conforto e qualidade.</p>
-    <p style="margin-top:6px;">Rod. Raposo Tavares, KM 66 — Mairinque/SP | CNPJ: Industrial Etruria</p>
-</footer>
+<!-- Modal Strategy Selection -->
+<div class="modal-overlay" id="strategyModalOverlay">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Escolha a Abordagem</h3>
+            <button class="modal-close" onclick="closeStrategyModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="strategyOptions">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
-// ===== PRODUCT DATA =====
-const TOP_PRODUCTS = [
-    { rank: 1, name: "Maya", cat: "Baby Flannel", price: 51.55, units: 499, rating: 4.6, img: "http://www.etruria.com.br/img/cache/772x480_Maya_p_site_2.jpg" },
-    { rank: 2, name: "Rosa Bebê", cat: "Lille Baby", price: 54.77, units: 477, rating: 4.3, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_rosinha_p_site.jpg" },
-    { rank: 3, name: "Lille Baby Oliva", cat: "Lille Baby", price: 54.16, units: 452, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_oliva_p_site.jpg" },
-    { rank: 4, name: "Doris", cat: "Baby Petit", price: 62.66, units: 415, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_DORIS.jpg" },
-    { rank: 5, name: "Boy", cat: "Baby Class", price: 66.43, units: 267, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_boy_1_p_site.jpg" },
-    { rank: 6, name: "Lille Rosé", cat: "Lille", price: 90.95, units: 206, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_Lille_rose_para_site.jpg" },
-    { rank: 7, name: "Lille Baby Marinho", cat: "Lille Baby", price: 46.80, units: 196, rating: 4.3, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_marinho_p_site.jpg" },
-    { rank: 8, name: "Coroinha", cat: "Baby Flannel", price: 57.31, units: 196, rating: 4.1, img: "http://www.etruria.com.br/img/cache/772x480_Coroinha_para_site-0.png" },
-    { rank: 9, name: "Creme", cat: "Bebêmanta", price: 72.20, units: 194, rating: 4.1, img: "http://www.etruria.com.br/img/cache/772x480_bebemanta_creme_1_p_site.jpg" },
-    { rank: 10, name: "Baby Lovely Bege", cat: "Baby Lovely", price: 54.02, units: 193, rating: 4.5, img: "http://www.etruria.com.br/img/cache/772x480_Lovely_baby_bege_para_site.jpg" }
+// ===== DATA LAYER =====
+const STAGES = [
+    { id: 'lead', label: 'Lead', color: 'var(--blue)', icon: '🔵' },
+    { id: 'contato', label: 'Contatado', color: 'var(--yellow)', icon: '🟡' },
+    { id: 'proposta', label: 'Proposta', color: 'var(--orange)', icon: '🟠' },
+    { id: 'pedido', label: 'Pedido', color: 'var(--green)', icon: '🟢' },
+    { id: 'recompra', label: 'Recompra', color: 'var(--purple)', icon: '🟣' }
 ];
 
-// ===== RENDER PRODUCTS =====
-const grid = document.getElementById('productsGrid');
-TOP_PRODUCTS.forEach(p => {
-    grid.innerHTML += `
-        <div class="product-card fade-in">
-            ${p.rank <= 3 ? `<span class="product-badge">#${p.rank} MAIS VENDIDO</span>` : ''}
-            <div class="product-img-wrap">
-                <img class="product-img" src="${p.img}" alt="${p.name}" loading="lazy" 
-                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%230f3460%22 width=%22200%22 height=%22200%22/><text fill=%22%23e8e8e8%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2216%22>${p.name}</text></svg>'">
+const STRATEGIES = [
+    { 
+        id: 'sazonalidade', 
+        label: '❄️ SAZONALIDADE (Urgência)', 
+        icon: 'fas fa-snowflake',
+        text: (name, shop, region, kit) => `Olá, ${name}. Tudo bem? 👋\n\nAcompanho o trabalho da ${shop} ai em ${region} e vi que vocês têm um mix bem legal de produtos. \n\nComo as temperaturas já vão começar a cair nas próximas semanas, a maioria dos lojistas parceiros já está reforçando o estoque para não perder o pico de vendas de inverno. \n\nEu represento a fábrica da Etruria direto aqui na região. Faz sentido eu te enviar o nosso catálogo rápido por aqui, só para você dar uma olhada nos modelos de cobertores de microfibra que dão a maior margem de lucro? 📋`
+    },
+    { 
+        id: 'rentabilidade', 
+        label: '💰 RENTABILIDADE (Lucro)', 
+        icon: 'fas fa-chart-line',
+        text: (name, shop, region, kit) => `Oi, ${name}, bom dia! 👋\n\nMeu nome é Daniel, sou representante comercial direto da fábrica de cobertores Etruria. \n\nEstou entrando em contato de forma bem objetiva porque lojistas com o perfil da ${shop} costumam ter um giro de estoque excelente com as nossas linhas, principalmente agora no 2º trimestre. \n\nVocê teria espaço na agenda essa semana para eu te mostrar nossa tabela de preços l pra lojistas e como podemos aumentar sua margem de lucro nesse inverno? 💰`
+    },
+    { 
+        id: 'followup', 
+        label: '🔁 FOLLOW-UP (Vácuo)', 
+        icon: 'fas fa-reply',
+        text: (name, shop, region, kit) => `Oi, ${name}! 😊\n\nSei que a rotina na gerência da ${shop} é bem corrida. \n\nSó subindo a mensagem para saber se você conseguiu dar uma olhada no catálogo da Etruria que te comentei. \n\nO foco é garantir que você tenha os produtos de maior lucro antes do pico do frio. Alguma dúvida onde eu possa te ajudar? 📋🤝`
+    },
+    { 
+        id: 'consultoria', 
+        label: '💎 CONSULTIVO (Premium)', 
+        icon: 'fas fa-crown',
+        text: (name, shop, region, kit) => `Oi, ${name}, tudo bem? 🤝\n\nRepresento a Etruria e busco parceiros que, assim como a ${shop}, prezam pela excelência e confiança no atendimento em ${region}. \n\nAcredito que nossa linha premium se encaixa perfeitamente no seu público exigente. \n\nPodemos agendar 5 min para eu te apresentar nosso modelo consultivo?\n\nDetalhes aqui: ${kit}`
+    }
+];
+
+function getLeads() {
+    const stored = localStorage.getItem('etruria_crm_leads');
+    if (stored) return JSON.parse(stored);
+    
+    // Fallback: Embed the 100 mapped leads if local storage is empty
+    const defaultLeads = [
+        { "id": "sp_001", "name": "Laleblu (Moema)", "channel": "loja", "status": "lead", "contact": "(11) 93354-0404", "url": "https://www.laleblu.com.br", "notes": "Moema - São Paulo. Foco em enxoval premium. Público A/B.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_002", "name": "Touché Bebê (Jardim Europa)", "channel": "loja", "status": "lead", "contact": "(11) 99518-3222", "url": "https://touchebebe.com.br", "notes": "Jardim Europa - SP. Maternidade de luxo. Alta relevância.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_003", "name": "Le Petit Ange (Perdizes)", "channel": "loja", "status": "lead", "contact": "(11) 94119-7979", "url": "https://lepetitange.com.br", "notes": "Perdizes - SP. Boutique enxoval e moda recém-nascido.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_004", "name": "Cantinho de Ninar (SP)", "channel": "instagram", "status": "lead", "contact": "11 98819-7449", "url": "https://www.cantinhodeninar.com.br", "notes": "Enxoval personalizado e bordados.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_005", "name": "Lukinhas Baby (Brás/S.Amaro)", "channel": "loja", "status": "lead", "contact": "(11) 97864-9093", "url": "https://www.lukinhasbaby.com.br", "notes": "Rede forte na Grande SP. Volume alto.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_006", "name": "Belo Bambino (ABC)", "channel": "loja", "status": "lead", "contact": "(11) 94001-8218", "url": "https://belobambino.com.br", "notes": "Santo André/ABC. Móveis e enxoval.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_007", "name": "Kids Store (Santo André)", "channel": "loja", "status": "lead", "contact": "(11) 97214-5881", "url": "Bairro Jardim - Santo André", "notes": "Boutique infantil com curadoria.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_008", "name": "Fraldão Baby (25 de Março)", "channel": "loja", "status": "lead", "contact": "(11) 94403-0902", "url": "http://www.fraldaobaby.com.br", "notes": "Giro altíssimo no polo 25 de Março.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_009", "name": "Alô Bebê (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Unidade Paulo Faccini", "url": "https://www.alobebe.com.br", "notes": "Unidade estratégica em Guarulhos.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_010", "name": "Baby Center (Barueri)", "channel": "loja", "status": "lead", "contact": "Centro Barueri", "url": "Google Maps", "notes": "Próximo a Alphaville. Forte varejo local.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_011", "name": "Mãe & Filhote (Alphaville)", "channel": "instagram", "status": "lead", "contact": "@maefilhotealphaville", "url": "Alphaville - Barueri", "notes": "Público premium de Alphaville.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_012", "name": "Mundo do Bebê (Alphaville)", "channel": "loja", "status": "lead", "contact": "Unidade Alphaville", "url": "https://www.mundodobebe.com.br", "notes": "Rede especializada em móveis/quarto.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_013", "name": "TotalBaby Store (SP)", "channel": "loja", "status": "lead", "contact": "(11) 2778-5590", "url": "Via Site", "notes": "E-commerce com sede em SP.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_014", "name": "Baby Use (Grande SP)", "channel": "loja", "status": "lead", "contact": "Rede Regional", "url": "Google Maps", "notes": "Loja local com alto giro.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_015", "name": "Atelier Baby (Moema)", "channel": "instagram", "status": "lead", "contact": "@atelierbabymoema", "url": "Moema - SP", "notes": "Boutique com foco em exclusividade.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_016", "name": "Loja do Bebê (Osasco)", "channel": "loja", "status": "lead", "contact": "Centro Osasco", "url": "Google Maps", "notes": "Polo varejista de Osasco.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_017", "name": "Pimpolho's ABC", "channel": "loja", "status": "lead", "contact": "S. Bernardo do Campo", "url": "Google Maps", "notes": "Multimarcas tradicional no ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_018", "name": "Mundo Infantil (Diadema)", "channel": "loja", "status": "lead", "contact": "Centro Diadema", "url": "Google Maps", "notes": "Vestuário e enxoval básico.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_019", "name": "Ciranda Baby (Guarulhos)", "channel": "shopee", "status": "lead", "contact": "Via Shopee/Insta", "url": "Guarulhos - SP", "notes": "Lojista de marketplace na Grande SP.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_020", "name": "Petite Boutique (S. Caetano)", "channel": "instagram", "status": "lead", "contact": "@petiteboutique_sc", "url": "São Caetano do Sul", "notes": "Público de alto poder aquisitivo no ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_021", "name": "ABC de Bebê (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "S. Bernardo - SP", "url": "abcdebebe.com.br", "notes": "Especializada em móveis e decoração.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_022", "name": "Tip Top (Shopping ABC)", "channel": "loja", "status": "lead", "contact": "S. André - SP", "url": "tiptop.com.br", "notes": "Franquia em shopping de alto fluxo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_023", "name": "Ri Happy Baby (Tatuapé)", "channel": "loja", "status": "lead", "contact": "Shopping Anália Franco", "url": "rihappy.com.br", "notes": "Unidade premium na Zona Leste.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_024", "name": "Upa Bebê (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Vila Augusta - Guarulhos", "url": "Google Maps", "notes": "Loja de bairro com mix variado.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_025", "name": "Bebê Feliz (Osasco)", "channel": "loja", "status": "lead", "contact": "Vila Yara - Osasco", "url": "Google Maps", "notes": "Próximo à divisa com SP/Jaguaré.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_026", "name": "Mundo do Enxoval (Jardins)", "channel": "loja", "status": "lead", "contact": "R. Colômbia - SP", "url": "mundodoenxoval.com.br", "notes": "Foco em luxo e sofisticação.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_027", "name": "Baby Store (Morumbi)", "channel": "loja", "status": "lead", "contact": "Shopping Morumbi", "url": "Google Maps", "notes": "Público de alto padrão.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_028", "name": "Ninho Baby (Barueri)", "channel": "instagram", "status": "lead", "contact": "@ninhobaby_oficial", "url": "Barueri (Centro)", "notes": "Atendimento focado via WhatsApp.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_029", "name": "Ki-Bebê (Diadema)", "channel": "loja", "status": "lead", "contact": "Av. Alda - Diadema", "url": "Google Maps", "notes": "Lojista de bairro tradicional.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_030", "name": "Mãe Coruja (Interlagos)", "channel": "loja", "status": "lead", "contact": "Av. Interlagos - SP", "url": "Google Maps", "notes": "Zona Sul de SP. Grande fluxo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_031", "name": "Petit Enxoval (Pacaembu)", "channel": "loja", "status": "lead", "contact": "Higienópolis - SP", "url": "Google Maps", "notes": "Bairro nobre, alta relevância.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_032", "name": "Baby Fashion (S. Bernardo)", "channel": "instagram", "status": "lead", "contact": "@babyfashion_abc", "url": "S. Bernardo", "notes": "Foco em moda e acessórios infantis.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_033", "name": "Cantinho do Bebê (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Pimentas - Guarulhos", "url": "Google Maps", "notes": "Região populosa, alto giro de enxoval básico.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_034", "name": "Loja Pim (Barueri)", "channel": "shopee", "status": "lead", "contact": "Via Shopee", "url": "Sede em Barueri", "notes": "Operador de e-commerce local.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_035", "name": "Bebê a Bordo (Santo Amaro)", "channel": "loja", "status": "lead", "contact": "Largo Treze - SP", "url": "Google Maps", "notes": "Polo de compras popular na ZS.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_036", "name": "Mimos & Cia (Ipiranga)", "channel": "instagram", "status": "lead", "contact": "@mimosciabebe", "url": "Ipiranga - SP", "notes": "Exclusividade em presentes e enxoval.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_037", "name": "Mundo dos Sonhos (Osasco)", "channel": "loja", "status": "lead", "contact": "R. Antonio Agu", "url": "Osasco - SP", "notes": "Principal rua de comércio de Osasco.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_038", "name": "Ponto do Bebê (S. Caetano)", "channel": "loja", "status": "lead", "contact": "Goias - S. Caetano", "url": "Google Maps", "notes": "Bairro de elite no ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_039", "name": "Baby Luck (Guarulhos)", "channel": "shopee", "status": "lead", "contact": "Via Shopee", "url": "Sede em Guarulhos", "notes": "Logística facilitada via Lancer.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_040", "name": "Enxovais Moema", "channel": "loja", "status": "lead", "contact": "Av. Rouxinol - SP", "url": "Google Maps", "notes": "Boutique em Moema Pássaros.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_041", "name": "Papo de Bebê (Alphaville)", "channel": "loja", "status": "lead", "contact": "Calçada das Anêmonas", "url": "Barueri - SP", "notes": "Centro comercial Alphaville.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_042", "name": "Lojão do Bebê (Brás)", "channel": "loja", "status": "lead", "contact": "R. Maria Marcolina", "url": "São Paulo - SP", "notes": "Polo atacadista do Brás.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_043", "name": "Semaan (Paris/Brás)", "channel": "loja", "status": "lead", "contact": "Unidade Brás", "url": "semaan.com.br", "notes": "Referência em brinquedos e baby na Z.Cerealista.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_044", "name": "Matsumoto (Luz)", "channel": "loja", "status": "lead", "contact": "Rua Barão de Duprat", "url": "lojasmatsumoto.com.br", "notes": "Atacado e varejo de grande porte.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_045", "name": "Vestindo o Bebê (Outlet)", "channel": "loja", "status": "lead", "contact": "Itinerante Grande SP", "url": "vestindoobebe.com.br", "notes": "Eventos de grande porte em SP e ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_046", "name": "Bebê Mania (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Assunção - SBC", "url": "Google Maps", "notes": "Loja de bairro com clientela local.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_047", "name": "Mimo Baby (Santo André)", "channel": "instagram", "status": "lead", "contact": "@mimobaby_sa", "url": "Vila Pires", "notes": "Boutique em bairro residencial nobre do ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_048", "name": "Casa do Bebê (Mauá)", "channel": "loja", "status": "lead", "contact": "Centro Mauá", "url": "Google Maps", "notes": "Cidade vizinha ao ABC. Acesso rápido.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_049", "name": "Baby King (S. Caetano)", "channel": "loja", "status": "lead", "contact": "Barcelona - SCS", "url": "Google Maps", "notes": "Região universitária e residencial.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_050", "name": "Estrela do Bebê (Osasco)", "channel": "loja", "status": "lead", "contact": "Bela Vista - Osasco", "url": "Google Maps", "notes": "Lojista com foco em kits prontos.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_051", "name": "Mundo Kid (Interlagos)", "channel": "loja", "status": "lead", "contact": "Shopping Interlagos", "url": "Google Maps", "notes": "Grande fluxo de classe média.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_052", "name": "Petit Enxovais (Anália Franco)", "channel": "loja", "status": "lead", "contact": "Jd. Anália Franco - SP", "url": "Google Maps", "notes": "Região mais nobre da Zona Leste.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_053", "name": "Ninho Store (Alphaville)", "channel": "instagram", "status": "lead", "contact": "@ninhostorealpha", "url": "Via Insta/Zap", "notes": "Curadoria de luxo em Barueri.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_054", "name": "Baby Dreams (Pinheiros)", "channel": "loja", "status": "lead", "contact": "Artur de Azevedo - SP", "url": "Google Maps", "notes": "Rua especializada em móveis/decoração infantil.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_055", "name": "Lojinha da Mamãe (V. Leopoldina)", "channel": "loja", "status": "lead", "contact": "Zona Oeste - SP", "url": "Google Maps", "notes": "Público antenado e moderno.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_056", "name": "Universo Bebê (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Macedo - Guarulhos", "url": "Google Maps", "notes": "Região central de Guarulhos.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_057", "name": "Ki-Xodó (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Rudge Ramos - SBC", "url": "Google Maps", "notes": "Bairro divisa com S. Caetano e SP.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_058", "name": "Baby Boom (Barueri)", "channel": "loja", "status": "lead", "contact": "Pq. dos Camargos", "url": "Google Maps", "notes": "Região de alto crescimento populacional.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_059", "name": "Mimos do Bebê (Itaquera)", "channel": "loja", "status": "lead", "contact": "Centro Itaquera - SP", "url": "Google Maps", "notes": "Foco em vendas de volume no varejo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_060", "name": "Enxovais & Cia (Diadema)", "channel": "loja", "status": "lead", "contact": "Piraporinha", "url": "Google Maps", "notes": "Polo industrial e comercial.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_061", "name": "Petit Baby (Tatuapé)", "channel": "loja", "status": "lead", "contact": "R. Itapura - SP", "url": "Google Maps", "notes": "Rua gastronômica e boutique na ZL.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_062", "name": "Baby Chick (Guarulhos)", "channel": "shopee", "status": "lead", "contact": "Via Shopee", "url": "Sede em Guarulhos", "notes": "Foco em brindes e acessórios baby.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_063", "name": "Ninho de Ouro (Mooca)", "channel": "loja", "status": "lead", "contact": "R. Juventus - SP", "url": "Google Maps", "notes": "Bairro tradicional com clientela fiel.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_064", "name": "Doce Bebê (Osasco)", "channel": "loja", "status": "lead", "contact": "Shopping União", "url": "Google Maps", "notes": "Shopping de grande massa populacional.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_065", "name": "Mundo Infantil (S. Caetano)", "channel": "loja", "status": "lead", "contact": "Santa Paula - SCS", "url": "Google Maps", "notes": "Bairro nobre de S. Caetano.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_066", "name": "Baby Store (Santo André)", "channel": "loja", "status": "lead", "contact": "Shopping ABC", "url": "Google Maps", "notes": "Shopping de referência no ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_067", "name": "Cantinho d'Anjo (Barueri)", "channel": "instagram", "status": "lead", "contact": "@cantinhodanjo_alpha", "url": "Via Insta", "notes": "Foco em saídas de maternidade luxo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_068", "name": "Gugu Baby (Penha)", "channel": "loja", "status": "lead", "contact": "Centro Penha - SP", "url": "Google Maps", "notes": "Comércio popular da Zona Leste.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_069", "name": "Bebê Moderno (V. Madalena)", "channel": "loja", "status": "lead", "contact": "Zona Oeste - SP", "url": "Google Maps", "notes": "Público alternativo e exigente.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_070", "name": "Amor de Mãe (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Ferrazópolis - SBC", "url": "Google Maps", "notes": "Varejo local de bairro.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_071", "name": "Kikos Baby (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Bonsucesso - GUA", "url": "Google Maps", "notes": "Região próxima à Rod. Dutra.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_072", "name": "Baby & Co (Barueri)", "channel": "loja", "status": "lead", "contact": "Shopping Tamboré", "url": "Google Maps", "notes": "Misto de Alphaville e Barueri.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_073", "name": "Docinho de Leite (Diadema)", "channel": "instagram", "status": "lead", "contact": "@docinholeite_diadema", "url": "Via Insta", "notes": "Foco em roupas de linha e tricô.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_074", "name": "Primeiro Passo (Osasco)", "channel": "loja", "status": "lead", "contact": "Km 18 - Osasco", "url": "Google Maps", "notes": "Bairro residencial consolidado.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_075", "name": "Anjo Azul (Sto Amaro)", "channel": "loja", "status": "lead", "contact": "R. Adolfo Pinheiro", "url": "Google Maps", "notes": "Eixo comercial forte do Sul.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_076", "name": "Petit Gâteau (Jardins)", "channel": "loja", "status": "lead", "contact": "Bela Cintra - SP", "url": "Google Maps", "notes": "Boutique de alto luxo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_077", "name": "Mimos Baby (S. Caetano)", "channel": "loja", "status": "lead", "contact": "R. Santa Maria", "url": "Google Maps", "notes": "Comércio de bairro qualificado.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_078", "name": "Dream Baby (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Jd. do Mar - SBC", "url": "Google Maps", "notes": "Bairro nobre de São Bernardo.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_079", "name": "Bebê Kids (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Taboão - Guarulhos", "url": "Google Maps", "notes": "Próximo ao aeroporto.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_080", "name": "Little Star (Barueri)", "channel": "instagram", "status": "lead", "contact": "@littlestar_alpha", "url": "Barueri", "notes": "Focus on high-end baby decor.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_081", "name": "Mundo das Mantas (Brás)", "channel": "loja", "status": "lead", "contact": "R. Miller - SP", "url": "Google Maps", "notes": "Polo de malharia e tecidos do Brás.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_082", "name": "Enxovais Ipiranga II", "channel": "loja", "status": "lead", "contact": "R. Silva Bueno - SP", "url": "Google Maps", "notes": "Grande varejo regional no Ipiranga.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_083", "name": "Anjo da Guarda (Belem)", "channel": "loja", "status": "lead", "contact": "Zona Leste - SP", "url": "Google Maps", "notes": "Tradicional lojista da ZL.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_084", "name": "Sonho de Bebê (Osasco)", "channel": "loja", "status": "lead", "contact": "Pq. Industrial - Osasco", "url": "Google Maps", "notes": "Região com muitas empresas e residências.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_085", "name": "Pequenos Mimos (Santo André)", "channel": "loja", "status": "lead", "contact": "Utinga - Sto André", "url": "Google Maps", "notes": "Divisa com S. Caetano e SP.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_086", "name": "Baby Central (Guarulhos)", "channel": "loja", "status": "lead", "contact": "Centro Comercial - GUA", "url": "Google Maps", "notes": "Alto giro no centro da cidade.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_087", "name": "Kids & Toys (Barueri)", "channel": "loja", "status": "lead", "contact": "Pq. Shopping Barueri", "url": "Google Maps", "notes": "Shopping de referência na região.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_088", "name": "Diadema Bebê", "channel": "loja", "status": "lead", "contact": "Pça da Moça - Diadema", "url": "Google Maps", "notes": "Centro de Diadema, área de shoppings.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_089", "name": "Boutique do Bebê (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Bairro Nova Petrópolis", "url": "Google Maps", "notes": "Bairro residencial qualificado em SBC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_090", "name": "Pequeno Anjo (Santo André)", "channel": "loja", "status": "lead", "contact": "Vila Alzira - SA", "url": "Google Maps", "notes": "Combi de loja física e atelier.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_091", "name": "Mundo Baby (Tatuapé)", "channel": "loja", "status": "lead", "contact": "R. Tuiuti - SP", "url": "Google Maps", "notes": "Polo de compras da Zona Leste.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_092", "name": "Baby Outlet (Osasco)", "channel": "loja", "status": "lead", "contact": "Pres. Altino - Osasco", "url": "Google Maps", "notes": "Região de fácil acesso ferroviário e rodoviário.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_093", "name": "Ninho Store (S. Caetano)", "channel": "instagram", "status": "lead", "contact": "@ninhostore_sc", "url": "Via Insta", "notes": "Vendas focadas no ABC.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_094", "name": "Kids Club (Alphaville)", "channel": "loja", "status": "lead", "contact": "Alpha Shopping", "url": "Google Maps", "notes": "Tradicional em Barueri/Alpha.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_095", "name": "Sereia Baby (Guarulhos)", "channel": "shopee", "status": "lead", "contact": "Via Shopee", "url": "Sede em Guarulhos", "notes": "Operador de e-commerce ágil.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_096", "name": "Reino do Bebê (S. Bernardo)", "channel": "loja", "status": "lead", "contact": "Riacho Grande - SBC", "url": "Google Maps", "notes": "Área periférica com alto consumo local.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_097", "name": "Baby Mania (Penha)", "channel": "loja", "status": "lead", "contact": "Pq. Boturussu - SP", "url": "Google Maps", "notes": "Lojista de bairro ZL.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_098", "name": "Mimos do ABC (Diadema)", "channel": "instagram", "status": "lead", "contact": "@mimosdoabc_diadema", "url": "Via Insta", "notes": "Foco em presentes personalizados.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_099", "name": "Planeta Kids (S. Caetano)", "channel": "loja", "status": "lead", "contact": "R. Alegre - SCS", "url": "Google Maps", "notes": "Rua de alto movimento em S. Caetano.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" },
+        { "id": "sp_100", "name": "Anjo do Céu (Osasco)", "channel": "loja", "status": "lead", "contact": "Rochdale - Osasco", "url": "Google Maps", "notes": "Grande polo residencial em Osasco.", "createdAt": "2026-03-30T15:10:00Z", "updatedAt": "2026-03-30T15:10:00Z" }
+    ];
+    
+    localStorage.setItem('etruria_crm_leads', JSON.stringify(defaultLeads));
+    document.getElementById('lastSave').textContent = new Date().toLocaleTimeString('pt-BR');
+    return defaultLeads;
+}
+function saveLeads(leads) {
+    localStorage.setItem('etruria_crm_leads', JSON.stringify(leads));
+    document.getElementById('lastSave').textContent = new Date().toLocaleTimeString('pt-BR');
+}
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+
+// ===== VIEW SWITCHING =====
+function switchView(viewId, link) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + viewId).classList.add('active');
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    if (link) link.classList.add('active');
+    document.querySelector('.sidebar').classList.remove('open');
+    renderAll();
+}
+
+// ===== MODAL =====
+function openModal(id) {
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.add('active');
+    if (id) {
+        const lead = getLeads().find(l => l.id === id);
+        if (lead) {
+            document.getElementById('modalTitle').textContent = 'Editar Lead';
+            document.getElementById('leadId').value = lead.id;
+            document.getElementById('leadName').value = lead.name;
+            document.getElementById('leadChannel').value = lead.channel;
+            document.getElementById('leadStatus').value = lead.status;
+            document.getElementById('leadContact').value = lead.contact || '';
+            document.getElementById('leadUrl').value = lead.url || '';
+            document.getElementById('leadNotes').value = lead.notes || '';
+        }
+    } else {
+        document.getElementById('modalTitle').textContent = 'Novo Lead';
+        document.getElementById('leadId').value = '';
+        document.getElementById('leadName').value = '';
+        document.getElementById('leadContact').value = '';
+        document.getElementById('leadUrl').value = '';
+        document.getElementById('leadNotes').value = '';
+        document.getElementById('leadStatus').value = 'lead';
+    }
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+function showStrategySelector(id) {
+    const lead = getLeads().find(l => l.id === id);
+    if (!lead) return;
+    
+    const overlay = document.getElementById('strategyModalOverlay');
+    const optionsContainer = document.getElementById('strategyOptions');
+    
+    optionsContainer.innerHTML = STRATEGIES.map(s => `
+        <button class="btn" style="width:100%; justify-content:flex-start; margin-bottom:8px; padding:12px;" onclick="openWA('${id}', '${s.id}')">
+            <i class="${s.icon}" style="width:24px; color:var(--accent);"></i> ${s.label}
+        </button>
+    `).join('');
+    
+    overlay.classList.add('active');
+}
+
+function closeStrategyModal() {
+    document.getElementById('strategyModalOverlay').classList.remove('active');
+}
+
+function saveLead() {
+    const name = document.getElementById('leadName').value.trim();
+    if (!name) { showToast('⚠️ Nome é obrigatório!'); return; }
+
+    const leads = getLeads();
+    const id = document.getElementById('leadId').value;
+    const data = {
+        id: id || generateId(),
+        name,
+        channel: document.getElementById('leadChannel').value,
+        status: document.getElementById('leadStatus').value,
+        contact: document.getElementById('leadContact').value.trim(),
+        url: document.getElementById('leadUrl').value.trim(),
+        notes: document.getElementById('leadNotes').value.trim(),
+        createdAt: id ? (leads.find(l => l.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    if (id) {
+        const idx = leads.findIndex(l => l.id === id);
+        if (idx !== -1) leads[idx] = data;
+    } else {
+        leads.push(data);
+    }
+    saveLeads(leads);
+    closeModal();
+    renderAll();
+    showToast('✅ Lead salvo com sucesso!');
+}
+
+function deleteLead(id) {
+    if (!confirm('Tem certeza que quer excluir este lead?')) return;
+    const leads = getLeads().filter(l => l.id !== id);
+    saveLeads(leads);
+    renderAll();
+    showToast('🗑️ Lead excluído');
+}
+
+function moveLead(id, newStatus) {
+    const leads = getLeads();
+    const lead = leads.find(l => l.id === id);
+    if (lead) {
+        lead.status = newStatus;
+        lead.updatedAt = new Date().toISOString();
+        saveLeads(leads);
+        renderAll();
+    }
+}
+
+// ===== RENDERING =====
+function renderAll() {
+    renderKPIs();
+    renderFunnel('miniFunnel');
+    renderFunnel('fullFunnel');
+    renderLeadsTable();
+    updateCharts();
+}
+
+// ===== WEATHER & AI ENGINE =====
+async function updateWeather() {
+    try {
+        const lat = -23.5505, lon = -46.6333; // São Paulo
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`);
+        const data = await res.json();
+        const temp = data.current.temperature_2m;
+        const code = data.current.weather_code;
+        
+        const alertDiv = document.getElementById('weatherAlert');
+        const desc = document.getElementById('weatherDesc');
+        const icon = document.getElementById('weatherIcon');
+        
+        alertDiv.style.display = 'flex';
+        
+        if (temp <= 18) {
+            icon.textContent = '❄️';
+            alertDiv.style.borderColor = 'var(--blue)';
+            desc.innerHTML = `Temperatura em SP: <strong>${temp}°C</strong>. O frio chegou! <br>Recomendação AI: Use o script <strong>"Sazonalidade 2.0"</strong> para máxima conversão.`;
+        } else {
+            icon.textContent = '☀️';
+            alertDiv.style.borderColor = 'var(--yellow)';
+            desc.innerHTML = `Temperatura em SP: <strong>${temp}°C</strong>. Clima ameno. <br>Recomendação AI: Foque em <strong>"Rentabilidade/Giro"</strong> para manter o estoque fluindo.`;
+        }
+    } catch(e) { console.error('Weather error:', e); }
+}
+
+// ===== BI DASHBOARD (CHART.JS) =====
+let funnelChart, regionChart;
+
+function updateCharts() {
+    const leads = getLeads();
+    
+    // 1. Funnel Performance
+    const funnelData = STAGES.map(s => leads.filter(l => l.status === s.id).length);
+    const ctxF = document.getElementById('funnelChart').getContext('2d');
+    
+    if(funnelChart) funnelChart.destroy();
+    funnelChart = new Chart(ctxF, {
+        type: 'doughnut',
+        data: {
+            labels: STAGES.map(s => s.label),
+            datasets: [{
+                data: funnelData,
+                backgroundColor: ['#58a6ff', '#d29922', '#f0883e', '#3fb950', '#bc8cff'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            plugins: { legend: { position: 'right', labels: { color: '#8b949e', font: { size: 10 } } } },
+            responsive: true, maintainAspectRatio: false
+        }
+    });
+
+    // 2. Regional Analysis
+    const regions = {};
+    leads.forEach(l => {
+        const regMatch = l.name.match(/\(([^)]+)\)/);
+        const r = regMatch ? regMatch[1] : 'Outros';
+        regions[r] = (regions[r] || 0) + 1;
+    });
+    
+    const sortedReg = Object.entries(regions).sort((a,b) => b[1] - a[1]).slice(0, 5);
+    const ctxR = document.getElementById('regionChart').getContext('2d');
+    
+    if(regionChart) regionChart.destroy();
+    regionChart = new Chart(ctxR, {
+        type: 'bar',
+        data: {
+            labels: sortedReg.map(r => r[0]),
+            datasets: [{
+                label: 'Número de Leads',
+                data: sortedReg.map(r => r[1]),
+                backgroundColor: 'rgba(88,166,255,0.2)',
+                borderColor: '#58a6ff',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            scales: { 
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b949e' } },
+                x: { grid: { display: false }, ticks: { color: '#8b949e' } }
+            },
+            plugins: { legend: { display: false } },
+            responsive: true, maintainAspectRatio: false
+        }
+    });
+}
+
+// ===== LEAD INVESTIGATOR (DEEP SEARCH) =====
+function deepSearch(type) {
+    const name = document.getElementById('leadName').value;
+    if (!name) { showToast('⚠️ Digite o nome da loja primeiro!'); return; }
+    
+    // Clean name from parentheses
+    const shop = name.replace(/\([^)]+\)/, '').trim();
+    const regMatch = name.match(/\(([^)]+)\)/);
+    const region = regMatch ? regMatch[1] : 'São Paulo';
+    
+    let url = '';
+    switch(type) {
+        case 'maps': url = `https://www.google.com/maps/search/${encodeURIComponent(shop + ' ' + region)}`; break;
+        case 'insta': url = `https://www.google.com/search?q=${encodeURIComponent('site:instagram.com "' + shop + '" ' + region)}`; break;
+        case 'whats': url = `https://www.google.com/search?q=${encodeURIComponent('"' + shop + '" ' + region + ' WhatsApp telefone')}`; break;
+        case 'google': url = `https://www.google.com/search?q=${encodeURIComponent('"' + shop + '" ' + region + ' CNPJ contato')}`; break;
+    }
+    window.open(url, '_blank');
+}
+
+function renderKPIs() {
+    const leads = getLeads();
+    const total = leads.length;
+    const byStatus = {};
+    STAGES.forEach(s => byStatus[s.id] = leads.filter(l => l.status === s.id).length);
+
+    const convRate = total > 0 ? ((byStatus.pedido + byStatus.recompra) / total * 100).toFixed(0) : 0;
+
+    // Leads needing follow-up (contacted > 3 days ago, still in contato/proposta)
+    const now = Date.now();
+    const needFollowUp = leads.filter(l => {
+        if (l.status !== 'contato' && l.status !== 'proposta') return false;
+        const days = (now - new Date(l.updatedAt).getTime()) / (1000*60*60*24);
+        return days >= 3;
+    }).length;
+
+    const kpis = [
+        { icon: 'fas fa-users', color: 'var(--blue)', bg: 'var(--blue-bg)', value: total, label: 'Total de Leads' },
+        { icon: 'fas fa-handshake', color: 'var(--green)', bg: 'var(--green-bg)', value: byStatus.pedido + byStatus.recompra, label: 'Pedidos Fechados' },
+        { icon: 'fas fa-percentage', color: 'var(--accent)', bg: 'var(--accent-bg)', value: convRate + '%', label: 'Taxa Conversão' },
+        { icon: 'fas fa-bell', color: 'var(--yellow)', bg: 'var(--yellow-bg)', value: needFollowUp, label: 'Follow-up Pendente' },
+    ];
+
+    const grid = document.getElementById('kpiGrid');
+    grid.innerHTML = kpis.map(k => `
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:${k.bg};color:${k.color};">
+                <i class="${k.icon}"></i>
             </div>
-            <div class="product-info">
-                <div class="product-name">${p.name}</div>
-                <div class="product-cat">${p.cat}</div>
-                <div class="product-meta">
-                    <span class="product-rating">${p.rating} ⭐</span>
-                    <span class="product-volume">${p.units} un/mês</span>
-                </div>
+            <div>
+                <div class="kpi-value">${k.value}</div>
+                <div class="kpi-label">${k.label}</div>
             </div>
         </div>
-    `;
-});
-
-// ===== CALCULATOR =====
-const marginSlider = document.getElementById('calcMargin');
-const marginDisplay = document.getElementById('marginDisplay');
-marginSlider.addEventListener('input', () => {
-    marginDisplay.textContent = marginSlider.value;
-    calculateProfit();
-});
-document.getElementById('calcQty').addEventListener('input', calculateProfit);
-document.getElementById('calcProduct').addEventListener('change', calculateProfit);
-
-function calculateProfit() {
-    const select = document.getElementById('calcProduct');
-    const opt = select.options[select.selectedIndex];
-    const cost = parseFloat(opt.dataset.cost);
-    const qty = parseInt(document.getElementById('calcQty').value) || 0;
-    const margin = parseInt(marginSlider.value) / 100;
-
-    const sellPrice = cost * (1 + margin);
-    const totalCost = cost * qty;
-    const totalRevenue = sellPrice * qty;
-    const totalProfit = totalRevenue - totalCost;
-    const roi = totalCost > 0 ? ((totalProfit / totalCost) * 100).toFixed(0) : 0;
-    const profitPerUnit = sellPrice - cost;
-
-    animateValue('resCusto', totalCost, 'R$');
-    animateValue('resReceita', totalRevenue, 'R$');
-    animateValue('resLucro', totalProfit, 'R$');
-    document.getElementById('resROI').textContent = roi + '%';
-    animateValue('resAnual', totalProfit * 12, 'R$');
-    animateValue('resTicket', profitPerUnit, 'R$');
+    `).join('');
 }
 
-function animateValue(id, target, prefix = '') {
-    const el = document.getElementById(id);
-    const formatted = prefix + ' ' + target.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    el.textContent = formatted;
+function renderFunnel(containerId) {
+    const leads = getLeads();
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = STAGES.map(stage => {
+        const stageLeads = leads.filter(l => l.status === stage.id);
+        const nextStage = STAGES[STAGES.indexOf(stage) + 1];
+
+        return `
+            <div class="funnel-column">
+                <div class="funnel-header" style="border-top: 3px solid ${stage.color};">
+                    ${stage.icon} ${stage.label}
+                    <span class="funnel-count">${stageLeads.length}</span>
+                </div>
+                <div class="funnel-body">
+                    ${stageLeads.map(l => `
+                        <div class="lead-card" onclick="openModal('${l.id}')">
+                            <div class="lead-name">${l.name}</div>
+                            <span class="lead-channel ${l.channel}">${channelLabel(l.channel)}</span>
+                            ${l.contact ? `<div class="lead-contact"><i class="fas fa-phone-alt"></i> ${l.contact}</div>` : ''}
+                            <div class="lead-date">${timeAgo(l.updatedAt)}</div>
+                            <div class="lead-actions" onclick="event.stopPropagation()">
+                                <button class="lead-action-btn" onclick="showStrategySelector('${l.id}')" title="Enviar WhatsApp" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">
+                                    <i class="fab fa-whatsapp"></i> Contato
+                                </button>
+                                ${nextStage ? `<button class="lead-action-btn" onclick="moveLead('${l.id}','${nextStage.id}')" title="Avançar para ${nextStage.label}">▶</button>` : ''}
+                                <button class="lead-action-btn del" onclick="deleteLead('${l.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-// Initial calculation
-calculateProfit();
+function renderLeadsTable() {
+    const leads = getLeads();
+    const search = (document.getElementById('searchLeads')?.value || '').toLowerCase();
+    const filtered = leads.filter(l => l.name.toLowerCase().includes(search) || (l.contact || '').toLowerCase().includes(search));
 
-// ===== ANIMATED COUNTERS =====
-function animateCounters() {
-    document.querySelectorAll('.hero-stat .number').forEach(el => {
-        const target = parseFloat(el.dataset.target);
-        const isDecimal = el.dataset.decimal === 'true';
-        const suffix = el.dataset.suffix || '';
-        const duration = 2000;
-        const start = performance.now();
+    const tbody = document.getElementById('leadsBody');
+    if (!tbody) return;
 
-        function update(now) {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = eased * target;
+    tbody.innerHTML = filtered.map(l => {
+        const stage = STAGES.find(s => s.id === l.status);
+        return `
+            <tr>
+                <td><strong>${l.name}</strong></td>
+                <td><span class="lead-channel ${l.channel}">${channelLabel(l.channel)}</span></td>
+                <td>${stage ? stage.icon + ' ' + stage.label : l.status}</td>
+                <td>${l.contact || '—'}</td>
+                <td>${timeAgo(l.updatedAt)}</td>
+                <td>
+                    <button class="lead-action-btn" onclick="showStrategySelector('${l.id}')" style="display:inline;width:auto;padding:4px 10px;background:var(--green-bg);color:var(--green);"><i class="fab fa-whatsapp"></i></button>
+                    <button class="lead-action-btn" onclick="openModal('${l.id}')" style="display:inline;width:auto;padding:4px 10px;"><i class="fas fa-edit"></i></button>
+                    <button class="lead-action-btn del" onclick="deleteLead('${l.id}')" style="display:inline;width:auto;padding:4px 10px;"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
 
-            if (isDecimal) {
-                el.textContent = current.toFixed(1) + suffix;
-            } else {
-                el.textContent = Math.round(current).toLocaleString('pt-BR') + suffix;
+// ===== HELPERS =====
+function channelLabel(ch) {
+    const map = { shopee: '🟠 Shopee', ml: '🟡 Mercado Livre', amazon: '🔵 Amazon', loja: '🟢 Loja Própria', instagram: '🟣 Instagram' };
+    return map[ch] || ch;
+}
+
+function timeAgo(date) {
+    if (!date) return '';
+    const diff = (Date.now() - new Date(date).getTime()) / 1000;
+    if (diff < 60) return 'agora';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+    const days = Math.floor(diff / 86400);
+    if (days === 1) return 'ontem';
+    if (days < 30) return days + ' dias atrás';
+    return new Date(date).toLocaleDateString('pt-BR');
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function copyScript(btn) {
+    const text = btn.closest('.script-card').querySelector('.script-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Copiar', 2000);
+    });
+}
+
+// ===== EXPORT / IMPORT =====
+function exportData() {
+    const data = { leads: getLeads(), exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `etruria_crm_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('📥 Dados exportados!');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.leads && Array.isArray(data.leads)) {
+                const existing = getLeads();
+                const existingIds = new Set(existing.map(l => l.id));
+                const newLeads = data.leads.filter(l => !existingIds.has(l.id));
+                saveLeads([...existing, ...newLeads]);
+                renderAll();
+                showToast(`📤 ${newLeads.length} leads importados!`);
             }
-
-            if (progress < 1) requestAnimationFrame(update);
+        } catch(err) {
+            showToast('❌ Erro ao importar arquivo');
         }
-        requestAnimationFrame(update);
-    });
+    };
+    reader.readAsText(file);
+    event.target.value = '';
 }
 
-// ===== INTERSECTION OBSERVER =====
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-// ===== PARTICLES =====
-const particlesContainer = document.getElementById('particles');
-for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 100 + 30;
-    p.style.width = size + 'px';
-    p.style.height = size + 'px';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.animationDuration = (Math.random() * 15 + 10) + 's';
-    p.style.animationDelay = (Math.random() * 10) + 's';
-    particlesContainer.appendChild(p);
+function loadMainLeads() {
+    // We try to fetch the renamed file
+    fetch('leads_prospeccao.json')
+        .then(response => {
+            if (!response.ok) throw new Error('File not found');
+            return response.json();
+        })
+        .then(data => {
+            if (data.leads) {
+                const existing = getLeads();
+                const existingIds = new Set(existing.map(l => l.id));
+                const newLeads = data.leads.filter(l => !existingIds.has(l.id));
+                saveLeads([...existing, ...newLeads]);
+                renderAll();
+                showToast(`🚀 ${newLeads.length} leads carregados com sucesso!`);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('⚠️ Erro: Use o botão IMPORTAR e selecione o arquivo "leads_prospeccao.json"');
+        });
 }
 
-// ===== START COUNTERS ON LOAD =====
-window.addEventListener('load', () => {
-    setTimeout(animateCounters, 500);
+function openWA(id, strategyId) {
+    const lead = getLeads().find(l => l.id === id);
+    if (!lead || !lead.contact) { showToast('⚠️ Sem número de contato!'); return; }
+    
+    // Clean number: keep only digits
+    const phone = lead.contact.replace(/\D/g, '');
+    if (phone.length < 10) { showToast('⚠️ Número inválido!'); return; }
+    
+    const KIT_URL = 'https://danielaguiar-hub.github.io/Vendas-antigravity/';
+    
+    let strategy = STRATEGIES.find(s => s.id === strategyId);
+    if (!strategy) strategy = STRATEGIES[0];
+    
+    const firstName = lead.name.split(' ')[0];
+    
+    // Extract region from name like "Store Name (Moema)"
+    const regMatch = lead.name.match(/\(([^)]+)\)/);
+    const region = regMatch ? regMatch[1] : 'sua região';
+    const shopName = lead.name.replace(/\([^)]+\)/, '').trim();
+    
+    const script = strategy.text(firstName, shopName, region, KIT_URL);
+    
+    const url = `https://wa.me/55${phone}?text=${encodeURIComponent(script)}`;
+    window.open(url, '_blank');
+    
+    // Auto-update status to "Contatado"
+    if (lead.status === 'lead') moveLead(id, 'contato');
+    
+    closeStrategyModal();
+}
+
+// ===== INITIAL RENDER =====
+renderAll();
+updateWeather();
+// Refresh weather every 30 mins
+setInterval(updateWeather, 1800000);
+
+// ===== PWA SETUP =====
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'flex';
 });
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+    }
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('SW registered:', reg);
+        }).catch(err => {
+            console.log('SW failed:', err);
+        });
+    });
+}
 </script>
 
 </body>
