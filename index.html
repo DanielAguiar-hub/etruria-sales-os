@@ -147,12 +147,16 @@
         .lead-contact { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
         .lead-date { font-size: 0.7rem; color: var(--text-dim); margin-top: 4px; }
         .lead-actions {
-            display: flex; gap: 4px; margin-top: 8px;
+            display: flex; gap: 8px; margin-top: 12px;
         }
         .lead-action-btn {
-            flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: 6px;
-            background: transparent; color: var(--text-muted); cursor: pointer;
-            font-size: 0.75rem; transition: all 0.2s; font-family: inherit;
+            flex: 1; height: 38px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border); border-radius: 8px;
+            background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+            font-size: 0.8rem; transition: all 0.2s; font-family: inherit;
+        }
+        @media(max-width:640px) {
+            .lead-action-btn { height: 46px; font-size: 0.95rem; }
         }
         .lead-action-btn:hover { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
         .lead-action-btn.del:hover { background: rgba(248,81,73,0.12); color: #f85149; border-color: #f85149; }
@@ -223,6 +227,17 @@
         .copy-btn:hover { background: var(--accent); color: #fff; }
 
         /* Toast */
+        .btn, .lead-action-btn, .bottom-nav-item, .sidebar a {
+            cursor: pointer;
+            touch-action: manipulation; /* Prevents double-tap zoom on mobile */
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn:active, .lead-action-btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
         .toast {
             position: fixed; bottom: 24px; right: 24px; z-index: 200;
             background: var(--green); color: #fff; padding: 12px 20px;
@@ -256,6 +271,38 @@
         .route-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 15px; display: flex; align-items: center; gap: 15px; }
         .route-item.visited { opacity: 0.6; border-left: 4px solid var(--green); }
         .route-dist { font-size: 0.7rem; color: var(--text-dim); }
+
+        /* Bottom Navigation (Mobile Only) */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 65px; background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: none; justify-content: space-around; align-items: center;
+            z-index: 1000; padding: 0 10px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+        .bottom-nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-muted); font-size: 0.65rem; text-decoration: none;
+            gap: 4px; transition: color 0.2s;
+        }
+        .bottom-nav-item i { font-size: 1.2rem; }
+        .bottom-nav-item.active { color: var(--accent); }
+
+        /* Manual/Tutorial Styles */
+        .manual-step { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; border-left: 4px solid var(--accent); }
+        .manual-step h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .manual-tip { background: rgba(88,166,255,0.05); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(88,166,255,0.2); font-size: 0.85rem; margin-top: 10px; }
+
+        @media(max-width:768px) {
+            .sidebar { display: none; }
+            .container { padding-left: 0; padding-bottom: 80px; }
+            .bottom-nav { display: flex; }
+            .page-title { font-size: 1.5rem; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .kpi-card { padding: 15px; }
+            .kpi-value { font-size: 1.3rem; }
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
@@ -471,8 +518,55 @@ Alguma dúvida ou algo específico que eu possa te ajudar? 🤝📋</div>
             </div>
         </div>
 
+        <!-- ===== MANUAL VIEW ===== -->
+        <div class="view" id="view-manual">
+            <div class="page-header">
+                <h1 class="page-title">🎓 Manual do Mestre Daniel</h1>
+            </div>
+            
+            <div class="manual-step">
+                <h3><i class="fas fa-phone-alt"></i> Passo 1: Aquecimento (Pre-Call)</h3>
+                <p>NUNCA mande um Zap frio do nada. Ligue antes!</p>
+                <div class="manual-tip">
+                    <strong>Dica de Ouro:</strong> Use o script <strong>Cold Call 2.0</strong>. O objetivo é só saber o nome do comprador e pedir permissão para enviar o catálogo. Isso humaniza o seu contato.
+                </div>
+            </div>
+
+            <div class="manual-step" style="border-left-color: var(--purple);">
+                <h3><i class="fas fa-walking"></i> Passo 2: O Poder do Presencial</h3>
+                <p>Mapeie a região e vá para a rua. Entre na loja com o catálogo aberto.</p>
+                <div class="manual-tip">
+                    <strong>Na Loja:</strong> Observe o que eles têm no estoque. Se vir muito concorrente, foque na <strong>Rentabilidade</strong> e no <strong>Pronta Entrega</strong> da Etruria.
+                </div>
+            </div>
+
+            <div class="manual-step" style="border-left-color: var(--green);">
+                <h3><i class="fas fa-handshake"></i> Passo 3: Fechamento & Re-compra</h3>
+                <p>O lucro está no retorno. Use os gatilhos climáticos (Alertas AI).</p>
+                <div class="manual-tip">
+                    <strong>Gatilho:</strong> "Oi [NOME], a previsão para SP é de frio abaixo de 15°C semana que vem. Vamos garantir as mantas agora?"
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
+
+<!-- Bottom Navigation (Mobile) -->
+<nav class="bottom-nav">
+    <a href="#" class="bottom-nav-item active" onclick="switchView('dashboard', this)">
+        <i class="fas fa-chart-line"></i><span>Dash</span>
+    </a>
+    <a href="#" class="bottom-nav-item" onclick="switchView('rota', this)">
+        <i class="fas fa-map-marked-alt"></i><span>Rota</span>
+    </a>
+    <a href="#" class="bottom-nav-item" onclick="switchView('leads', this)">
+        <i class="fas fa-users"></i><span>Leads</span>
+    </a>
+    <a href="#" class="bottom-nav-item" onclick="switchView('manual', this)">
+        <i class="fas fa-graduation-cap"></i><span>Manual</span>
+    </a>
+</nav>
 
 <!-- Modal -->
 <div class="modal-overlay" id="modalOverlay">
@@ -733,13 +827,38 @@ function saveLeads(leads) {
 function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
 
 // ===== VIEW SWITCHING =====
-function switchView(viewId, link) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + viewId).classList.add('active');
-    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-    if (link) link.classList.add('active');
+function switchView(viewId, el) {
+    const views = document.querySelectorAll('.view');
+    const links = document.querySelectorAll('.sidebar-nav a');
+    const bottomLinks = document.querySelectorAll('.bottom-nav-item');
+    
+    views.forEach(v => v.classList.remove('active'));
+    links.forEach(l => l.classList.remove('active'));
+    bottomLinks.forEach(l => l.classList.remove('active'));
+
+    const targetView = document.getElementById(`view-${viewId}`);
+    if (targetView) targetView.classList.add('active');
+    
+    // Add active class to either sidebar link or bottom nav link
+    if (el) {
+        el.classList.add('active');
+    } else {
+        const sideTarget = Array.from(links).find(l => l.getAttribute('data-view') === viewId);
+        const bottomTarget = Array.from(bottomLinks).find(l => l.getAttribute('onclick')?.includes(`'${viewId}'`));
+        if (sideTarget) sideTarget.classList.add('active');
+        if (bottomTarget) bottomTarget.classList.add('active');
+    }
+
+    if (viewId === 'funnel') renderFunnel('fullFunnel');
+    if (viewId === 'leads') renderLeadsTable();
+    if (viewId === 'rota') renderRouteList();
+    if (viewId === 'networking') renderNetworking();
+    
+    // Close sidebar on mobile if it was open
     document.querySelector('.sidebar').classList.remove('open');
-    renderAll();
+    
+    // Scroll to top for better UX
+    window.scrollTo(0,0);
 }
 
 // ===== MODAL =====
@@ -983,10 +1102,10 @@ function renderKPIs() {
     const visitedCount = leads.filter(l => l.visited).length;
 
     const kpis = [
-        { icon: 'fas fa-users', color: 'var(--blue)', bg: 'var(--blue-bg)', value: total, label: 'Total de Leads' },
-        { icon: 'fas fa-walking', color: 'var(--purple)', bg: 'var(--purple-bg)', value: visitedCount, label: 'Visitas Campo' },
-        { icon: 'fas fa-handshake', color: 'var(--green)', bg: 'var(--green-bg)', value: byStatus.pedido + byStatus.recompra, label: 'Pedidos Fechados' },
-        { icon: 'fas fa-percentage', color: 'var(--accent)', bg: 'var(--accent-bg)', value: convRate + '%', label: 'Taxa Conversão' },
+        { icon: 'fas fa-users', color: 'var(--blue)', bg: 'var(--blue-bg)', value: total, label: 'Total' },
+        { icon: 'fas fa-walking', color: 'var(--purple)', bg: 'var(--purple-bg)', value: visitedCount, label: 'Visitas' },
+        { icon: 'fas fa-handshake', color: 'var(--green)', bg: 'var(--green-bg)', value: byStatus.pedido + byStatus.recompra, label: 'Vendas' },
+        { icon: 'fas fa-percentage', color: 'var(--accent)', bg: 'var(--accent-bg)', value: convRate + '%', label: 'Conv.' },
     ];
 
     const grid = document.getElementById('kpiGrid');
