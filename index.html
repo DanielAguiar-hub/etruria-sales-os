@@ -232,6 +232,31 @@
         .toast.show { transform: translateY(0); opacity: 1; }
 
         /* Scrollbar */
+        /* Badge styles */
+        .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+        .badge-visit { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+        .badge-hot { background: rgba(233,69,96,0.15); color: var(--accent); border: 1px solid var(--accent); }
+
+        /* Networking Cards */
+        .net-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .net-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 16px; transition: all 0.2s;
+        }
+        .net-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .net-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .net-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-bg); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        .net-info h4 { font-size: 0.9rem; }
+        .net-info p { font-size: 0.75rem; color: var(--text-muted); }
+        .net-footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px; }
+
+        /* Route View */
+        .route-filter { background: var(--bg-card); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .route-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .route-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .route-item.visited { opacity: 0.6; border-left: 4px solid var(--green); }
+        .route-dist { font-size: 0.7rem; color: var(--text-dim); }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -253,6 +278,10 @@
             <a href="#" data-view="funnel" onclick="switchView('funnel',this)"><i class="fas fa-filter"></i> Funil de Vendas</a>
             <a href="#" data-view="leads" onclick="switchView('leads',this)"><i class="fas fa-users"></i> Todos os Leads</a>
             <a href="#" data-view="scripts" onclick="switchView('scripts',this)"><i class="fas fa-comment-dots"></i> Scripts de Venda</a>
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 8px 15px;">
+            <a href="#" data-view="rota" onclick="switchView('rota',this)"><i class="fas fa-map-marked-alt"></i> Trabalho de Rota</a>
+            <a href="#" data-view="networking" onclick="switchView('networking',this)"><i class="fas fa-handshake"></i> Rede de Parceiros</a>
+            <a href="#" data-view="eventos" onclick="switchView('eventos',this)"><i class="fas fa-calendar-star"></i> Radar de Feiras</a>
             <a href="#" id="installBtn" style="display:none; color:var(--green);"><i class="fas fa-download"></i> Instalar App</a>
         </nav>
         <div class="sidebar-stats">
@@ -384,6 +413,64 @@ Alguma dúvida ou algo específico que eu possa te ajudar? 🤝📋</div>
             </div>
         </div>
 
+        <!-- ===== ROTA VIEW ===== -->
+        <div class="view" id="view-rota">
+            <div class="page-header">
+                <h1 class="page-title">📍 Trabalho de Rota</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Novo na Rota</button>
+                </div>
+            </div>
+            
+            <div class="route-filter">
+                <i class="fas fa-map-marker-alt" style="color:var(--accent);"></i>
+                <select id="routeRegionFilter" style="background:transparent; border:none; color:var(--text); font-weight:700; outline:none; font-family:inherit;" onchange="renderRouteList()">
+                    <option value="">Selecione uma Região / Bairro</option>
+                </select>
+                <div style="flex:1;"></div>
+                <div id="routeStats" style="font-size:0.8rem; color:var(--text-muted);"></div>
+            </div>
+
+            <div class="route-list" id="routeList">
+                 <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- ===== NETWORKING VIEW ===== -->
+        <div class="view" id="view-networking">
+            <div class="page-header">
+                <h1 class="page-title">🤝 Rede de Parceiros</h1>
+                <button class="btn btn-primary" onclick="openPartnerModal()"><i class="fas fa-plus"></i> Novo Parceiro</button>
+            </div>
+            <div class="net-grid" id="partnerGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- ===== EVENTOS VIEW ===== -->
+        <div class="view" id="view-eventos">
+            <div class="page-header">
+                <h1 class="page-title">📅 Radar de Feiras</h1>
+            </div>
+            <div class="table-wrap">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>Evento</th><th>Data</th><th>Local</th><th>Status</th><th>Objetivo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsBody">
+                        <tr>
+                            <td style="font-weight:700;">🛍️ ABC Kids Expo</td><td>Maio 2026</td><td>S. André</td><td><span class="badge badge-hot">Confirmado</span></td><td>Networking com lojistas do ABC</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:700;">🧵 Polo Têxtil Brás</td><td>Toda Terça</td><td>Brás/SP</td><td><span class="badge badge-visit" style="background:var(--blue-bg);color:var(--blue);">Recorrente</span></td><td>Visita a atacados e novos leads</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -443,9 +530,16 @@ Alguma dúvida ou algo específico que eu possa te ajudar? 🤝📋</div>
                 </div>
             </div>
 
+            <div class="form-group" style="margin-top:16px; display:flex; align-items:center; gap:10px; background:rgba(188,140,255,0.05); padding:10px; border-radius:var(--radius-sm); border:1px solid rgba(188,140,255,0.2);">
+                <label style="margin-bottom:0; flex:1; cursor:pointer;" for="leadVisited">
+                    <i class="fas fa-walking" style="color:var(--purple);"></i> Visita Presencial Realizada?
+                </label>
+                <input type="checkbox" id="leadVisited" style="width:20px; height:20px; cursor:pointer;">
+            </div>
+
             <div class="form-group" style="margin-top:16px;">
-                <label>Observações</label>
-                <textarea id="leadNotes" placeholder="Produtos de interesse, volume estimado, etc."></textarea>
+                <label>Observações de Campo</label>
+                <textarea id="leadNotes" placeholder="O que viu na loja? (Ex: Espaço grande, vende muito concorrente X)"></textarea>
             </div>
         </div>
         <div class="modal-footer">
@@ -505,6 +599,18 @@ const STRATEGIES = [
         label: '💎 CONSULTIVO (Premium)', 
         icon: 'fas fa-crown',
         text: (name, shop, region, kit) => `Oi, ${name}, tudo bem? 🤝\n\nSou o Daniel e cuido da parte comercial da Etruria em ${region}. \n\nBusco parceiros que, assim como a ${shop}, prezam pela confiança e qualidade no atendimento. Acredito que nossa linha Premium (Mantas e Edredons) encaixa perfeitamente no seu público. \n\nPodemos agendar 5 min para eu te apresentar nosso modelo consultivo?\n\nDetalhes aqui: ${kit}`
+    },
+    { 
+        id: 'coldcall', 
+        label: '📞 COLD CALL (Aquecimento)', 
+        icon: 'fas fa-phone-volume',
+        text: (name, shop, region, kit) => `SCRIPT DE LIGAÇÃO:\n"Bom dia! Aqui é o Daniel, da fábrica Etruria. \nEstou com um material rápido focado em como preparar o estoque de inverno da ${shop} ai em ${region} com alta margem.\nQuem é o responsável pelas compras? Posso mandar no WhatsApp dele?"`
+    },
+    { 
+        id: 'instagram', 
+        label: '📸 INSTAGRAM DM (Bypass)', 
+        icon: 'fab fa-instagram',
+        text: (name, shop, region, kit) => `Oi pessoal da ${shop}! 😊 \n\nVi o post de vocês sobre a nova coleção/vitrine e achei o bom gosto impecável. \n\nTrabalho direto com a fábrica da Etruria e temos uma linha que é a cara do público de vocês. \n\nCom quem eu poderia falar sobre uma parceria de revenda? Seria um prazer apresentar nosso catálogo de fábrica para vocês. 🤝`
     }
 ];
 
@@ -651,6 +757,7 @@ function openModal(id) {
             document.getElementById('leadContact').value = lead.contact || '';
             document.getElementById('leadUrl').value = lead.url || '';
             document.getElementById('leadNotes').value = lead.notes || '';
+            document.getElementById('leadVisited').checked = !!lead.visited;
         }
     } else {
         document.getElementById('modalTitle').textContent = 'Novo Lead';
@@ -659,6 +766,7 @@ function openModal(id) {
         document.getElementById('leadContact').value = '';
         document.getElementById('leadUrl').value = '';
         document.getElementById('leadNotes').value = '';
+        document.getElementById('leadVisited').checked = false;
         document.getElementById('leadStatus').value = 'lead';
     }
 }
@@ -698,6 +806,7 @@ function saveLead() {
         contact: document.getElementById('leadContact').value.trim(),
         url: document.getElementById('leadUrl').value.trim(),
         notes: document.getElementById('leadNotes').value.trim(),
+        visited: document.getElementById('leadVisited').checked,
         createdAt: id ? (leads.find(l => l.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
@@ -739,6 +848,8 @@ function renderAll() {
     renderFunnel('miniFunnel');
     renderFunnel('fullFunnel');
     renderLeadsTable();
+    renderRouteList();
+    renderNetworking();
     updateCharts();
 }
 
@@ -869,11 +980,13 @@ function renderKPIs() {
         return days >= 3;
     }).length;
 
+    const visitedCount = leads.filter(l => l.visited).length;
+
     const kpis = [
         { icon: 'fas fa-users', color: 'var(--blue)', bg: 'var(--blue-bg)', value: total, label: 'Total de Leads' },
+        { icon: 'fas fa-walking', color: 'var(--purple)', bg: 'var(--purple-bg)', value: visitedCount, label: 'Visitas Campo' },
         { icon: 'fas fa-handshake', color: 'var(--green)', bg: 'var(--green-bg)', value: byStatus.pedido + byStatus.recompra, label: 'Pedidos Fechados' },
         { icon: 'fas fa-percentage', color: 'var(--accent)', bg: 'var(--accent-bg)', value: convRate + '%', label: 'Taxa Conversão' },
-        { icon: 'fas fa-bell', color: 'var(--yellow)', bg: 'var(--yellow-bg)', value: needFollowUp, label: 'Follow-up Pendente' },
     ];
 
     const grid = document.getElementById('kpiGrid');
@@ -908,7 +1021,10 @@ function renderFunnel(containerId) {
                 <div class="funnel-body">
                     ${stageLeads.map(l => `
                         <div class="lead-card" onclick="openModal('${l.id}')">
-                            <div class="lead-name">${l.name}</div>
+                            <div class="lead-name">
+                                ${l.name}
+                                ${l.visited ? '<span class="badge badge-visit" style="margin-left:5px;"><i class="fas fa-check"></i> Visitado</span>' : ''}
+                            </div>
                             <span class="lead-channel ${l.channel}">${channelLabel(l.channel)}</span>
                             ${l.contact ? `<div class="lead-contact"><i class="fas fa-phone-alt"></i> ${l.contact}</div>` : ''}
                             <div class="lead-date">${timeAgo(l.updatedAt)}</div>
@@ -939,7 +1055,10 @@ function renderLeadsTable() {
         const stage = STAGES.find(s => s.id === l.status);
         return `
             <tr>
-                <td><strong>${l.name}</strong></td>
+                <td>
+                    <strong>${l.name}</strong>
+                    ${l.visited ? '<br><span class="badge badge-visit">Visitado</span>' : ''}
+                </td>
                 <td><span class="lead-channel ${l.channel}">${channelLabel(l.channel)}</span></td>
                 <td>${stage ? stage.icon + ' ' + stage.label : l.status}</td>
                 <td>${l.contact || '—'}</td>
@@ -947,7 +1066,6 @@ function renderLeadsTable() {
                 <td>
                     <button class="lead-action-btn" onclick="showStrategySelector('${l.id}')" style="display:inline;width:auto;padding:4px 10px;background:var(--green-bg);color:var(--green);"><i class="fab fa-whatsapp"></i></button>
                     <button class="lead-action-btn" onclick="openModal('${l.id}')" style="display:inline;width:auto;padding:4px 10px;"><i class="fas fa-edit"></i></button>
-                    <button class="lead-action-btn del" onclick="deleteLead('${l.id}')" style="display:inline;width:auto;padding:4px 10px;"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `;
@@ -970,6 +1088,110 @@ function timeAgo(date) {
     if (days === 1) return 'ontem';
     if (days < 30) return days + ' dias atrás';
     return new Date(date).toLocaleDateString('pt-BR');
+}
+
+// ===== FIELD OPS (ROTA & NETWORKING) =====
+function renderRouteList() {
+    const leads = getLeads();
+    const regionFilter = document.getElementById('routeRegionFilter');
+    const list = document.getElementById('routeList');
+    
+    // Populate regions dropdown if empty
+    const regions = [...new Set(leads.map(l => {
+        const match = l.name.match(/\(([^)]+)\)/);
+        return match ? match[1] : null;
+    }).filter(r => r))].sort();
+    
+    if (regionFilter.options.length <= 1) {
+        regions.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r; opt.textContent = r;
+            regionFilter.appendChild(opt);
+        });
+    }
+
+    const selectedRegion = regionFilter.value;
+    const filtered = selectedRegion ? leads.filter(l => l.name.includes(`(${selectedRegion})`)) : [];
+    
+    document.getElementById('routeStats').textContent = selectedRegion ? `${filtered.length} lojas encontradas` : 'Escolha uma região para mapear';
+
+    list.innerHTML = filtered.map(l => `
+        <div class="route-item ${l.visited ? 'visited' : ''}">
+            <div style="flex:1;">
+                <div style="font-weight:700;">${l.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${l.contact || 'Sem telefone'}</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn" onclick="window.open('https://www.google.com/maps/search/${encodeURIComponent(l.name)}', '_blank')" title="Abrir GPS">
+                    <i class="fas fa-directions"></i> GPS
+                </button>
+                <button class="btn ${l.visited ? 'btn-success' : ''}" onclick="toggleVisit('${l.id}')">
+                    <i class="fas ${l.visited ? 'fa-check-double' : 'fa-walking'}"></i> ${l.visited ? 'Visitado' : 'Check-in'}
+                </button>
+            </div>
+        </div>
+    `).join('') || (selectedRegion ? '<p style="text-align:center; padding:40px; color:var(--text-dim);">Nenhuma loja mapeada nesta região.</p>' : '');
+}
+
+function toggleVisit(id) {
+    const leads = getLeads();
+    const lead = leads.find(l => l.id === id);
+    if (lead) {
+        lead.visited = !lead.visited;
+        lead.updatedAt = new Date().toISOString();
+        saveLeads(leads);
+        renderAll();
+        renderRouteList();
+        showToast(lead.visited ? '📍 Visita registrada!' : '↩️ Status resetado');
+    }
+}
+
+function renderNetworking() {
+    const partners = JSON.parse(localStorage.getItem('etruria_partners') || '[]');
+    const grid = document.getElementById('partnerGrid');
+    if (!grid) return;
+    
+    const defaultPartners = [
+        { name: 'Ricardo (Tapetes)', segment: 'Tapetes & Mantas', contact: '11 98877-0022', obs: 'Me indicou 3 lojas no Tatuapé.' },
+        { name: 'Sérgio (Enxovais)', segment: 'Cama/Mesa/Banho', contact: '11 94444-1122', obs: 'Parceiro forte na região de Alphaville.' }
+    ];
+    
+    const list = partners.length > 0 ? partners : defaultPartners;
+    if (partners.length === 0) localStorage.setItem('etruria_partners', JSON.stringify(defaultPartners));
+
+    grid.innerHTML = list.map(p => `
+        <div class="net-card">
+            <div class="net-header">
+                <div class="net-avatar">${p.name[0]}</div>
+                <div class="net-info">
+                    <h4>${p.name}</h4>
+                    <p>${p.segment}</p>
+                </div>
+            </div>
+            <div style="font-size:0.8rem; line-height:1.4;">
+                <strong>Obs:</strong> ${p.obs || '—'}
+            </div>
+            <div class="net-footer">
+                <button class="btn" style="flex:1;" onclick="window.open('https://wa.me/55${(p.contact || '').replace(/\D/g,'')}')">
+                    <i class="fab fa-whatsapp"></i> Zap
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openPartnerModal() {
+    const name = prompt("Nome do Parceiro:");
+    if (!name) return;
+    const segment = prompt("Segmento (ex: Tapetes, Toalhas):");
+    const contact = prompt("WhatsApp (com DDD):");
+    const obs = prompt("Observações / Troca de Indicação:");
+    
+    const partners = JSON.parse(localStorage.getItem('etruria_partners') || '[]');
+    partners.push({ name, segment, contact, obs });
+    localStorage.setItem('etruria_partners', JSON.stringify(partners));
+    renderNetworking();
+    showToast('🤝 Parceiro adicionado!');
 }
 
 function showToast(msg) {
