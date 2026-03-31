@@ -345,15 +345,15 @@
             <div class="scripts-grid">
                 <div class="script-card">
                     <button class="copy-btn" onclick="copyScript(this)"><i class="fas fa-copy"></i> Copiar</button>
-                    <h4>❄️ 1. Sazonalidade 2.0 (Urgência)</h4>
-                    <span class="script-label">Foco: Gancho Regional e Antecipação</span>
-                    <div class="script-text">Olá, [NOME]. Tudo bem? 👋
+                    <h4>❄️ 1. Sazonalidade 2.0 (Humano/Direto)</h4>
+                    <span class="script-label">Foco: Curadoria e Antecipação do Frio</span>
+                    <div class="script-text">Oi, [NOME]! 😊 
 
-Acompanho o trabalho da [LOJA] aqui em [REGIÃO] e vi que vocês têm um mix bem legal de produtos. 
+Acompanho o trabalho da [LOJA] aqui em [REGIÃO] e acho a curadoria de vocês sensacional. 
 
-Como as temperaturas já vão começar a cair nas próximas semanas, a maioria dos lojistas parceiros já está reforçando o estoque para não perder o pico de vendas de inverno. 
+Como as temperaturas já vão começar a cair aqui em SP nas próximas semanas, a maioria dos lojistas parceiros já está reforçando o estoque pra não ficar sem produto no pico das vendas. 
 
-Represento a fábrica da Etruria direto aqui na região. Faz sentido eu te enviar o nosso catálogo rápido por aqui, só para você dar uma olhada nos modelos que dão a maior margem de lucro? 📋</div>
+Trabalho direto com a fábrica da Etruria. Faz sentido eu te enviar o nosso catálogo rápido por aqui? Os modelos de microfibra estão com um giro absurdo. 📋</div>
                 </div>
 
                 <div class="script-card">
@@ -371,13 +371,15 @@ Você teria espaço na agenda essa semana para eu te mostrar nossa tabela de pre
 
                 <div class="script-card">
                     <button class="copy-btn" onclick="copyScript(this)"><i class="fas fa-copy"></i> Copiar</button>
-                    <h4>🔁 3. Follow-up (O "Vácuo")</h4>
-                    <span class="script-label">Foco: Acompanhamento e Persistência</span>
+                    <h4>🔁 3. Follow-up (Empático)</h4>
+                    <span class="script-label">Foco: Conexão e Ajuda</span>
                     <div class="script-text">Oi, [NOME]! 😊
 
-Sei que a rotina na gerência da [LOJA] é bem corrida. Só subindo a mensagem para saber se você conseguiu dar uma olhada no catálogo da Etruria. 
+Imagino que a rotina na [LOJA] esteja super corrida por aí. 
 
-O foco é garantir que você tenha os produtos de maior lucro antes do pico do frio. Alguma dúvida onde eu possa te ajudar? 📋🤝</div>
+Só passando para saber se você conseguiu dar uma olhadinha no catálogo da Etruria. O meu foco é garantir que você receba os produtos de maior giro antes que a fábrica pause os novos pedidos pelo pico do frio. 
+
+Alguma dúvida ou algo específico que eu possa te ajudar? 🤝📋</div>
                 </div>
             </div>
         </div>
@@ -482,27 +484,27 @@ const STAGES = [
 const STRATEGIES = [
     { 
         id: 'sazonalidade', 
-        label: '❄️ SAZONALIDADE (Urgência)', 
+        label: '❄️ SAZONALIDADE (Humanizada)', 
         icon: 'fas fa-snowflake',
-        text: (name, shop, region, kit) => `Olá, ${name}. Tudo bem? 👋\n\nAcompanho o trabalho da ${shop} ai em ${region} e vi que vocês têm um mix bem legal de produtos. \n\nComo as temperaturas já vão começar a cair nas próximas semanas, a maioria dos lojistas parceiros já está reforçando o estoque para não perder o pico de vendas de inverno. \n\nEu represento a fábrica da Etruria direto aqui na região. Faz sentido eu te enviar o nosso catálogo rápido por aqui, só para você dar uma olhada nos modelos de cobertores de microfibra que dão a maior margem de lucro? 📋`
+        text: (name, shop, region, kit) => `Oi, ${name}! 😊 \n\nAcompanho o trabalho da ${shop} em ${region} e acho a curadoria de vocês sensacional. \n\nComo as temperaturas já vão começar a cair aqui em SP nas próximas semanas, a maioria dos parceiros já está reforçando o estoque pra não ficar sem produto no pico das vendas de inverno. \n\nTrabalho direto com a fábrica da Etruria aqui na região. Faz sentido eu te enviar o nosso catálogo rápido por aqui? Os modelos de microfibra estao com um giro absurdo. 📋`
     },
     { 
         id: 'rentabilidade', 
-        label: '💰 RENTABILIDADE (Lucro)', 
+        label: '💰 RENTABILIDADE (Parceria)', 
         icon: 'fas fa-chart-line',
-        text: (name, shop, region, kit) => `Oi, ${name}, bom dia! 👋\n\nMeu nome é Daniel, sou representante comercial direto da fábrica de cobertores Etruria. \n\nEstou entrando em contato de forma bem objetiva porque lojistas com o perfil da ${shop} costumam ter um giro de estoque excelente com as nossas linhas, principalmente agora no 2º trimestre. \n\nVocê teria espaço na agenda essa semana para eu te mostrar nossa tabela de preços l pra lojistas e como podemos aumentar sua margem de lucro nesse inverno? 💰`
+        text: (name, shop, region, kit) => `Bom dia, ${name}! 👋 \n\nAqui é o Daniel, da Etruria. \n\nEntro em contato porque vi que a ${shop} tem um posicionamento muito legal em ${region}. Nossas linhas de enxovais costumam dar uma margem de lucro excelente para lojas com o seu perfil, especialmente agora no outono/inverno. \n\nSeria interessante para você conhecer nossa tabela de fábrica e ver como podemos aumentar seu faturamento este mês? 📈`
     },
     { 
         id: 'followup', 
-        label: '🔁 FOLLOW-UP (Vácuo)', 
+        label: '🔁 FOLLOW-UP (Apoio)', 
         icon: 'fas fa-reply',
-        text: (name, shop, region, kit) => `Oi, ${name}! 😊\n\nSei que a rotina na gerência da ${shop} é bem corrida. \n\nSó subindo a mensagem para saber se você conseguiu dar uma olhada no catálogo da Etruria que te comentei. \n\nO foco é garantir que você tenha os produtos de maior lucro antes do pico do frio. Alguma dúvida onde eu possa te ajudar? 📋🤝`
+        text: (name, shop, region, kit) => `Oi, ${name}! 😊 \n\nImagino que a rotina na ${shop} esteja super corrida. \n\nSó passando para saber se você conseguiu ver o catálogo que te mandei. O objetivo é garantir que você receba os produtos antes que a fábrica pause os pedidos pelo pico do frio. \n\nAlguma dúvida ou algo que eu possa te ajudar agora? 🤝`
     },
     { 
         id: 'consultoria', 
         label: '💎 CONSULTIVO (Premium)', 
         icon: 'fas fa-crown',
-        text: (name, shop, region, kit) => `Oi, ${name}, tudo bem? 🤝\n\nRepresento a Etruria e busco parceiros que, assim como a ${shop}, prezam pela excelência e confiança no atendimento em ${region}. \n\nAcredito que nossa linha premium se encaixa perfeitamente no seu público exigente. \n\nPodemos agendar 5 min para eu te apresentar nosso modelo consultivo?\n\nDetalhes aqui: ${kit}`
+        text: (name, shop, region, kit) => `Oi, ${name}, tudo bem? 🤝\n\nSou o Daniel e cuido da parte comercial da Etruria em ${region}. \n\nBusco parceiros que, assim como a ${shop}, prezam pela confiança e qualidade no atendimento. Acredito que nossa linha Premium (Mantas e Edredons) encaixa perfeitamente no seu público. \n\nPodemos agendar 5 min para eu te apresentar nosso modelo consultivo?\n\nDetalhes aqui: ${kit}`
     }
 ];
 
