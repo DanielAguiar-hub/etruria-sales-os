@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etruria — Parceria E-commerce Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #1a1a2e;
+            --primary-light: #16213e;
+            --accent: #e94560;
+            --accent-glow: rgba(233, 69, 96, 0.3);
+            --gold: #f0c040;
+            --gold-glow: rgba(240, 192, 64, 0.25);
+            --success: #0f9b58;
+            --surface: #0f3460;
+            --surface-light: rgba(15, 52, 96, 0.6);
+            --text: #e8e8e8;
+            --text-muted: #a0a0b8;
+            --gradient-hero: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+            --gradient-accent: linear-gradient(135deg, #e94560, #ff6b6b);
+            --gradient-gold: linear-gradient(135deg, #f0c040, #f7d774);
+            --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --shadow-lg: 0 16px 64px rgba(0,0,0,0.4);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .particle {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow), transparent);
+            animation: float-particle linear infinite;
+        }
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: var(--gradient-hero); position: relative; text-align: center;
+            padding: 80px 24px;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+            background: linear-gradient(to top, var(--primary), transparent);
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(233, 69, 96, 0.15); border: 1px solid rgba(233, 69, 96, 0.3);
+            padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 600;
+            color: var(--accent); margin-bottom: 24px; letter-spacing: 1px; text-transform: uppercase;
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            50% { box-shadow: 0 0 20px 5px var(--accent-glow); }
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 900; line-height: 1.1;
+            margin-bottom: 20px; letter-spacing: -1px;
+        }
+        .hero h1 span { background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-muted);
+            max-width: 700px; margin: 0 auto 40px; font-weight: 300;
+        }
+        .hero-stats {
+            display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+            position: relative; z-index: 2;
+        }
+        .hero-stat {
+            text-align: center; padding: 20px; background: var(--gradient-card);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius);
+            min-width: 160px; backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .hero-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+        .hero-stat .number {
+            font-size: 2.5rem; font-weight: 800; display: block;
+            background: var(--gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-stat .label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--gradient-accent); color: #fff; border: none;
+            padding: 16px 36px; border-radius: 50px; font-size: 1.05rem; font-weight: 700;
+            cursor: pointer; text-decoration: none; letter-spacing: 0.5px;
+            transition: all 0.3s; box-shadow: 0 4px 20px var(--accent-glow);
+            margin-top: 32px; position: relative; z-index: 2;
+        }
+        .cta-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 30px var(--accent-glow); }
+
+        /* ===== SECTIONS ===== */
+        section { padding: 100px 0; position: relative; }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--accent); margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        .section-desc { color: var(--text-muted); max-width: 600px; margin-bottom: 48px; font-size: 1.05rem; }
+
+        /* ===== POR QUE VENDER ===== */
+        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .reason-card {
+            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 32px; position: relative; overflow: hidden;
+            transition: all 0.4s;
+        }
+        .reason-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--gradient-accent); transform: scaleX(0); transform-origin: left;
+            transition: transform 0.4s;
+        }
+        .reason-card:hover::before { transform: scaleX(1); }
+        .reason-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(233,69,96,0.2); }
+        .reason-icon {
+            width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 20px;
+        }
+        .reason-icon.red { background: rgba(233,69,96,0.15); color: var(--accent); }
+        .reason-icon.gold { background: rgba(240,192,64,0.15); color: var(--gold); }
+        .reason-icon.green { background: rgba(15,155,88,0.15); color: var(--success); }
+        .reason-icon.blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .reason-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+        .reason-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+        .reason-highlight {
+            display: inline-block; background: rgba(233,69,96,0.12); color: var(--accent);
+            font-weight: 700; padding: 2px 8px; border-radius: 4px;
+        }
+
+        /* ===== TOP PRODUTOS ===== */
+        .products-showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .product-card {
+            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); overflow: hidden; transition: all 0.4s;
+            position: relative;
+        }
+        .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: rgba(240,192,64,0.3); }
+        .product-badge {
+            position: absolute; top: 12px; left: 12px; z-index: 2;
+            background: var(--gradient-gold); color: var(--primary); font-size: 0.7rem;
+            font-weight: 800; padding: 4px 12px; border-radius: 50px; letter-spacing: 0.5px;
+        }
+        .product-img {
+            width: 100%; height: 180px; object-fit: cover;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.5s;
+        }
+        .product-card:hover .product-img { transform: scale(1.08); }
+        .product-img-wrap { overflow: hidden; }
+        .product-info { padding: 16px; }
+        .product-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .product-cat { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; }
+        .product-meta { display: flex; justify-content: space-between; align-items: center; }
+        .product-rating { color: var(--gold); font-size: 0.85rem; font-weight: 600; }
+        .product-volume { color: var(--success); font-size: 0.8rem; font-weight: 600; }
+
+        /* ===== CALCULADORA ===== */
+        .calc-section { background: linear-gradient(135deg, rgba(15,52,96,0.4), rgba(26,26,46,0.8)); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); }
+        .calc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 48px; }
+        @media(max-width: 768px) { .calc-container { grid-template-columns: 1fr; padding: 24px; } }
+        .calc-left h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; }
+        .calc-left p { color: var(--text-muted); margin-bottom: 32px; }
+        .calc-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .calc-form select, .calc-form input {
+            width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 1rem; font-family: inherit; margin-bottom: 20px;
+            transition: border-color 0.3s; outline: none;
+        }
+        .calc-form select option { background: var(--primary); }
+        .calc-form select:focus, .calc-form input:focus { border-color: var(--accent); }
+        .calc-btn {
+            width: 100%; padding: 16px; background: var(--gradient-accent); color: #fff;
+            border: none; border-radius: var(--radius-sm); font-size: 1.05rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
+        }
+        .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--accent-glow); }
+        .calc-results {
+            display: grid; gap: 16px;
+        }
+        .calc-result-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm); padding: 20px; text-align: center;
+            transition: all 0.3s;
+        }
+        .calc-result-card.highlight { border-color: var(--gold); background: var(--gold-glow); }
+        .calc-result-card .value { font-size: 1.8rem; font-weight: 800; display: block; }
+        .calc-result-card .value.gold { background: var(--gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .calc-result-card .value.green { color: var(--success); }
+        .calc-result-card .desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ===== DIFERENCIAIS ===== */
+        .diff-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .diff-card {
+            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 28px; text-align: center;
+            transition: all 0.4s;
+        }
+        .diff-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+        .diff-emoji { font-size: 2.5rem; margin-bottom: 16px; display: block; }
+        .diff-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+        .diff-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* ===== DEPOIMENTOS ===== */
+        .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .testimonial-card {
+            background: var(--gradient-card); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 28px; position: relative;
+        }
+        .testimonial-card::before {
+            content: '"'; position: absolute; top: 12px; left: 20px;
+            font-size: 4rem; color: rgba(233,69,96,0.15); font-family: Georgia, serif; line-height: 1;
+        }
+        .testimonial-text { font-style: italic; color: var(--text-muted); margin-bottom: 16px; padding-top: 24px; line-height: 1.7; }
+        .testimonial-stars { color: var(--gold); margin-bottom: 8px; font-size: 0.9rem; }
+        .testimonial-author { font-weight: 700; font-size: 0.9rem; }
+        .testimonial-source { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* ===== CTA FINAL ===== */
+        .cta-final {
+            text-align: center; padding: 100px 24px;
+            background: linear-gradient(135deg, var(--primary-light), var(--surface));
+            border-radius: var(--radius); margin: 60px 0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .cta-final h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; margin-bottom: 16px; }
+        .cta-final p { color: var(--text-muted); max-width: 550px; margin: 0 auto 32px; font-size: 1.05rem; }
+        .cta-whatsapp {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: #25d366; color: #fff; padding: 18px 40px;
+            border-radius: 50px; font-size: 1.1rem; font-weight: 700;
+            text-decoration: none; transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+        }
+        .cta-whatsapp:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width: 640px) {
+            .hero-stats { gap: 16px; }
+            .hero-stat { min-width: 130px; padding: 14px; }
+            .hero-stat .number { font-size: 1.8rem; }
+            section { padding: 60px 0; }
+            .products-showcase { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .product-img { height: 130px; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--primary); }
+        ::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* Nav */
+        .topnav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(26, 26, 46, 0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s;
+        }
+        .topnav-brand { font-weight: 800; font-size: 1.15rem; letter-spacing: 2px; }
+        .topnav-links { display: flex; gap: 24px; }
+        .topnav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.3s; }
+        .topnav-links a:hover { color: var(--accent); }
+        @media(max-width:640px) { .topnav-links { display: none; } }
+    </style>
+</head>
+<body>
+
+<!-- Particles Background -->
+<div class="particles" id="particles"></div>
+
+<!-- Navigation -->
+<nav class="topnav">
+    <div class="topnav-brand">ETRURIA</div>
+    <div class="topnav-links">
+        <a href="#porque">Por que Etruria</a>
+        <a href="#produtos">Bestsellers</a>
+        <a href="#calculadora">Calculadora</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#contato">Contato</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container" style="position:relative;z-index:2;">
+        <div class="hero-badge"><i class="fas fa-crown"></i> Parceiro Oficial Etruria</div>
+        <h1>Venda os <span>Cobertores #1</span><br>do Brasil no seu E-commerce</h1>
+        <p class="hero-subtitle">
+            Desde 1973, a Etruria fabrica os cobertores e mantas mais vendidos dos marketplaces brasileiros. 
+            Agora, queremos que o seu e-commerce faça parte dessa história de sucesso.
+        </p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="number" data-target="11339">0</span>
+                <span class="label">Unidades vendidas/mês</span>
+            </div>
+            <div class="hero-stat">
+                <span class="number" data-target="4.9" data-decimal="true">0</span>
+                <span class="label">Avaliação média ⭐</span>
+            </div>
+            <div class="hero-stat">
+                <span class="number" data-target="53" data-suffix="+">0</span>
+                <span class="label">Anos de mercado</span>
+            </div>
+            <div class="hero-stat">
+                <span class="number" data-target="85">0</span>
+                <span class="label">Produtos no catálogo</span>
+            </div>
+        </div>
+        <a href="#calculadora" class="cta-btn">
+            <i class="fas fa-calculator"></i> Calcule Seu Lucro Agora
+        </a>
+    </div>
+</section>
+
+<!-- Por que vender Etruria -->
+<section id="porque">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-chart-line"></i> Oportunidade de Mercado</div>
+        <h2 class="section-title">Por que seu e-commerce precisa da Etruria?</h2>
+        <p class="section-desc">Os números não mentem. Veja por que os maiores vendedores online do Brasil já trabalham com a gente.</p>
+
+        <div class="reasons-grid">
+            <div class="reason-card fade-in">
+                <div class="reason-icon red"><i class="fas fa-fire"></i></div>
+                <h3>Demanda Explosiva Comprovada</h3>
+                <p>Mais de <span class="reason-highlight">11.000 unidades/mês</span> vendidas nos principais marketplaces. Não é estimativa — são dados reais de Mercado Livre, Shopee e Amazon.</p>
+            </div>
+            <div class="reason-card fade-in">
+                <div class="reason-icon gold"><i class="fas fa-coins"></i></div>
+                <h3>Margem de Lucro Premium</h3>
+                <p>Trabalhe com margens de <span class="reason-highlight">35% a 50%</span> nos produtos baby e adulto. O ticket médio alto dos cobertores adultos (R$160+) garante lucro mesmo com baixo volume.</p>
+            </div>
+            <div class="reason-card fade-in">
+                <div class="reason-icon green"><i class="fas fa-sync-alt"></i></div>
+                <h3>Alto Giro de Estoque</h3>
+                <p>Produtos baby são presentes de maternidade — vendem o ano inteiro, sem sazonalidade. Seu estoque gira rápido e você repõe com frequência.</p>
+            </div>
+            <div class="reason-card fade-in">
+                <div class="reason-icon blue"><i class="fas fa-star"></i></div>
+                <h3>Nota 4.9★ — Zero Dor de Cabeça</h3>
+                <p>Produtos com avaliação média de <span class="reason-highlight">4.9 estrelas</span>. Menos devoluções, menos reclamações, mais clientes satisfeitos comprando de novo.</p>
+            </div>
+            <div class="reason-card fade-in">
+                <div class="reason-icon red"><i class="fas fa-leaf"></i></div>
+                <h3>Sustentabilidade que Vende</h3>
+                <p>100% feitos com <strong>PET reciclado</strong>. O consumidor moderno paga mais por produtos eco-friendly — e isso diferencia o seu anúncio da concorrência.</p>
+            </div>
+            <div class="reason-card fade-in">
+                <div class="reason-icon gold"><i class="fas fa-shield-alt"></i></div>
+                <h3>100% Antialérgico Certificado</h3>
+                <p>Selo de qualidade <strong>ISO</strong>. Ideal para bebês e pessoas com alergias. Argumento de venda imbatível nos marketplaces de bebê.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Top Produtos -->
+<section id="produtos" style="background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-trophy"></i> Bestsellers Comprovados</div>
+        <h2 class="section-title">Top 10 Produtos Mais Vendidos</h2>
+        <p class="section-desc">Estes são os campeões de venda nos maiores marketplaces. Comece seu estoque por aqui.</p>
+
+        <div class="products-showcase" id="productsGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</section>
+
+<!-- Calculadora -->
+<section id="calculadora">
+    <div class="container">
+        <div class="calc-section">
+            <div class="calc-container">
+                <div class="calc-left">
+                    <div class="section-label"><i class="fas fa-calculator"></i> Simulador de Lucro</div>
+                    <h2>Calcule Quanto Você Vai Lucrar</h2>
+                    <p>Selecione a linha de produto e a quantidade. Veja em tempo real o retorno do seu investimento.</p>
+                    <div class="calc-form">
+                        <label>Linha de Produto</label>
+                        <select id="calcProduct">
+                            <option value="lille-baby" data-cost="35" data-sell="55">Lille Baby (Baby) — Custo ~R$35 | Venda ~R$55</option>
+                            <option value="baby-flannel" data-cost="33" data-sell="52">Baby Flannel (Baby) — Custo ~R$33 | Venda ~R$52</option>
+                            <option value="baby-class" data-cost="42" data-sell="66">Baby Class (Baby) — Custo ~R$42 | Venda ~R$66</option>
+                            <option value="baby-petit" data-cost="40" data-sell="63">Baby Petit (Baby) — Custo ~R$40 | Venda ~R$63</option>
+                            <option value="bebemanta" data-cost="46" data-sell="72">Bebêmanta (Baby) — Custo ~R$46 | Venda ~R$72</option>
+                            <option value="baby-lovely" data-cost="34" data-sell="54">Baby Lovely (Baby) — Custo ~R$34 | Venda ~R$54</option>
+                            <option value="lille" data-cost="58" data-sell="91">Lille (Adulto) — Custo ~R$58 | Venda ~R$91</option>
+                            <option value="bonno-adulto" data-cost="135" data-sell="210">Bonno Adulto — Custo ~R$135 | Venda ~R$210</option>
+                            <option value="lovely" data-cost="120" data-sell="190">Lovely (Adulto) — Custo ~R$120 | Venda ~R$190</option>
+                            <option value="cobertores" data-cost="100" data-sell="165">Cobertores Premium — Custo ~R$100 | Venda ~R$165</option>
+                        </select>
+
+                        <label>Quantidade Mensal (unidades)</label>
+                        <input type="number" id="calcQty" value="50" min="1" max="10000" placeholder="Ex: 50">
+
+                        <label>Margem de Revenda (%)</label>
+                        <input type="range" id="calcMargin" min="20" max="80" value="40" style="accent-color: var(--accent);">
+                        <div style="text-align: center; color: var(--accent); font-weight: 700; font-size: 1.3rem; margin: -10px 0 20px;">
+                            <span id="marginDisplay">40</span>%
+                        </div>
+
+                        <button class="calc-btn" onclick="calculateProfit()">
+                            <i class="fas fa-chart-bar"></i> Calcular Lucro
+                        </button>
+                    </div>
+                </div>
+                <div class="calc-results" id="calcResults">
+                    <div class="calc-result-card">
+                        <span class="value" id="resCusto">R$ 0</span>
+                        <span class="desc">Investimento Mensal</span>
+                    </div>
+                    <div class="calc-result-card">
+                        <span class="value" id="resReceita">R$ 0</span>
+                        <span class="desc">Receita Bruta Mensal</span>
+                    </div>
+                    <div class="calc-result-card highlight">
+                        <span class="value gold" id="resLucro">R$ 0</span>
+                        <span class="desc">💰 Lucro Mensal</span>
+                    </div>
+                    <div class="calc-result-card">
+                        <span class="value green" id="resROI">0%</span>
+                        <span class="desc">Retorno sobre Investimento</span>
+                    </div>
+                    <div class="calc-result-card highlight">
+                        <span class="value gold" id="resAnual">R$ 0</span>
+                        <span class="desc">🚀 Projeção Lucro Anual</span>
+                    </div>
+                    <div class="calc-result-card">
+                        <span class="value" id="resTicket">R$ 0</span>
+                        <span class="desc">Lucro por Unidade</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Diferenciais -->
+<section id="diferenciais">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-gem"></i> Vantagem Competitiva</div>
+        <h2 class="section-title">O Que Faz a Etruria Imbatível</h2>
+        <p class="section-desc">Não é só um cobertor. É tecnologia, tradição e inovação de 53 anos em cada peça.</p>
+
+        <div class="diff-grid">
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">🧬</span>
+                <h3>Tecnologia Antialérgica</h3>
+                <p>100% das fibras são hipoalergênicas. Perfeito para bebês, idosos e famílias com sensibilidade.</p>
+            </div>
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">♻️</span>
+                <h3>Feito de PET Reciclado</h3>
+                <p>Cada cobertor recicla garrafas PET. Sustentabilidade que o consumidor moderno exige e paga mais.</p>
+            </div>
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">🏭</span>
+                <h3>Fábrica Própria desde 1973</h3>
+                <p>Não é importado, não é revenda. Produção nacional com controle total de qualidade.</p>
+            </div>
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">🧸</span>
+                <h3>Toque Extra Macio</h3>
+                <p>Tecnologia exclusiva de acabamento. O "toque de seda" que faz o cliente comprar de novo.</p>
+            </div>
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">🎨</span>
+                <h3>85 Estampas & Cores</h3>
+                <p>Catálogo diverso para todos os gostos. De baby delicado a adulto sofisticado.</p>
+            </div>
+            <div class="diff-card fade-in">
+                <span class="diff-emoji">🏆</span>
+                <h3>4.9★ nos Marketplaces</h3>
+                <p>A nota mais alta do segmento. Menos devoluções, mais reputação, mais vendas pro seu e-commerce.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Avaliações -->
+<section style="background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-comments"></i> Prova Social</div>
+        <h2 class="section-title">O Que Dizem os Compradores</h2>
+        <p class="section-desc">Avaliações reais de consumidores nos principais marketplaces.</p>
+
+        <div class="testimonials">
+            <div class="testimonial-card fade-in">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Comprei o Lille Baby Oliva pro meu bebê e é simplesmente PERFEITO. Super macio, quentinho e não dá alergia nenhuma. Já comprei 3 de presente!"</p>
+                <p class="testimonial-author">Maria S.</p>
+                <p class="testimonial-source">Mercado Livre — Verificado</p>
+            </div>
+            <div class="testimonial-card fade-in">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"O Bonno Adulto é absurdo de bom. Parece seda! Comprei um e voltei pra comprar pra casa toda. Melhor cobertor que já tive na vida."</p>
+                <p class="testimonial-author">Ricardo L.</p>
+                <p class="testimonial-source">Amazon — Verificado</p>
+            </div>
+            <div class="testimonial-card fade-in">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Vendo na Shopee e adicionei a linha Etruria no meu mix. Virou disparado o produto que mais vende. Reposição toda semana!"</p>
+                <p class="testimonial-author">Lojista Anônimo</p>
+                <p class="testimonial-source">Shopee — Vendedor Parceiro</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+<section id="contato">
+    <div class="container">
+        <div class="cta-final">
+            <div class="section-label"><i class="fas fa-handshake"></i> Próximo Passo</div>
+            <h2>Pronto para Vender os<br><span style="background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cobertores #1 do Brasil?</span></h2>
+            <p>Fale direto com seu representante Etruria. Pedido mínimo acessível, condições especiais para e-commerce e suporte total para você começar a lucrar.</p>
+            <a href="https://wa.me/5511975768512" target="_blank" class="cta-whatsapp">
+                <i class="fab fa-whatsapp" style="font-size: 1.4rem;"></i> Falar com Representante
+            </a>
+            <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                <i class="fas fa-phone-alt"></i> (11) 4718-8700 &nbsp;|&nbsp; 
+                <i class="fas fa-envelope"></i> etruria@etruria.com.br
+            </p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>Etruria Têxtil — Desde 1973 transformando garrafas PET em conforto e qualidade.</p>
+    <p style="margin-top:6px;">Rod. Raposo Tavares, KM 66 — Mairinque/SP | CNPJ: Industrial Etruria</p>
+</footer>
+
+<script>
+// ===== PRODUCT DATA =====
+const TOP_PRODUCTS = [
+    { rank: 1, name: "Maya", cat: "Baby Flannel", price: 51.55, units: 499, rating: 4.6, img: "http://www.etruria.com.br/img/cache/772x480_Maya_p_site_2.jpg" },
+    { rank: 2, name: "Rosa Bebê", cat: "Lille Baby", price: 54.77, units: 477, rating: 4.3, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_rosinha_p_site.jpg" },
+    { rank: 3, name: "Lille Baby Oliva", cat: "Lille Baby", price: 54.16, units: 452, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_oliva_p_site.jpg" },
+    { rank: 4, name: "Doris", cat: "Baby Petit", price: 62.66, units: 415, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_DORIS.jpg" },
+    { rank: 5, name: "Boy", cat: "Baby Class", price: 66.43, units: 267, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_boy_1_p_site.jpg" },
+    { rank: 6, name: "Lille Rosé", cat: "Lille", price: 90.95, units: 206, rating: 4.9, img: "http://www.etruria.com.br/img/cache/772x480_Lille_rose_para_site.jpg" },
+    { rank: 7, name: "Lille Baby Marinho", cat: "Lille Baby", price: 46.80, units: 196, rating: 4.3, img: "http://www.etruria.com.br/img/cache/772x480_lille_baby_marinho_p_site.jpg" },
+    { rank: 8, name: "Coroinha", cat: "Baby Flannel", price: 57.31, units: 196, rating: 4.1, img: "http://www.etruria.com.br/img/cache/772x480_Coroinha_para_site-0.png" },
+    { rank: 9, name: "Creme", cat: "Bebêmanta", price: 72.20, units: 194, rating: 4.1, img: "http://www.etruria.com.br/img/cache/772x480_bebemanta_creme_1_p_site.jpg" },
+    { rank: 10, name: "Baby Lovely Bege", cat: "Baby Lovely", price: 54.02, units: 193, rating: 4.5, img: "http://www.etruria.com.br/img/cache/772x480_Lovely_baby_bege_para_site.jpg" }
+];
+
+// ===== RENDER PRODUCTS =====
+const grid = document.getElementById('productsGrid');
+TOP_PRODUCTS.forEach(p => {
+    grid.innerHTML += `
+        <div class="product-card fade-in">
+            ${p.rank <= 3 ? `<span class="product-badge">#${p.rank} MAIS VENDIDO</span>` : ''}
+            <div class="product-img-wrap">
+                <img class="product-img" src="${p.img}" alt="${p.name}" loading="lazy" 
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%230f3460%22 width=%22200%22 height=%22200%22/><text fill=%22%23e8e8e8%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2216%22>${p.name}</text></svg>'">
+            </div>
+            <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-cat">${p.cat}</div>
+                <div class="product-meta">
+                    <span class="product-rating">${p.rating} ⭐</span>
+                    <span class="product-volume">${p.units} un/mês</span>
+                </div>
+            </div>
+        </div>
+    `;
+});
+
+// ===== CALCULATOR =====
+const marginSlider = document.getElementById('calcMargin');
+const marginDisplay = document.getElementById('marginDisplay');
+marginSlider.addEventListener('input', () => {
+    marginDisplay.textContent = marginSlider.value;
+    calculateProfit();
+});
+document.getElementById('calcQty').addEventListener('input', calculateProfit);
+document.getElementById('calcProduct').addEventListener('change', calculateProfit);
+
+function calculateProfit() {
+    const select = document.getElementById('calcProduct');
+    const opt = select.options[select.selectedIndex];
+    const cost = parseFloat(opt.dataset.cost);
+    const qty = parseInt(document.getElementById('calcQty').value) || 0;
+    const margin = parseInt(marginSlider.value) / 100;
+
+    const sellPrice = cost * (1 + margin);
+    const totalCost = cost * qty;
+    const totalRevenue = sellPrice * qty;
+    const totalProfit = totalRevenue - totalCost;
+    const roi = totalCost > 0 ? ((totalProfit / totalCost) * 100).toFixed(0) : 0;
+    const profitPerUnit = sellPrice - cost;
+
+    animateValue('resCusto', totalCost, 'R$');
+    animateValue('resReceita', totalRevenue, 'R$');
+    animateValue('resLucro', totalProfit, 'R$');
+    document.getElementById('resROI').textContent = roi + '%';
+    animateValue('resAnual', totalProfit * 12, 'R$');
+    animateValue('resTicket', profitPerUnit, 'R$');
+}
+
+function animateValue(id, target, prefix = '') {
+    const el = document.getElementById(id);
+    const formatted = prefix + ' ' + target.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    el.textContent = formatted;
+}
+
+// Initial calculation
+calculateProfit();
+
+// ===== ANIMATED COUNTERS =====
+function animateCounters() {
+    document.querySelectorAll('.hero-stat .number').forEach(el => {
+        const target = parseFloat(el.dataset.target);
+        const isDecimal = el.dataset.decimal === 'true';
+        const suffix = el.dataset.suffix || '';
+        const duration = 2000;
+        const start = performance.now();
+
+        function update(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = eased * target;
+
+            if (isDecimal) {
+                el.textContent = current.toFixed(1) + suffix;
+            } else {
+                el.textContent = Math.round(current).toLocaleString('pt-BR') + suffix;
+            }
+
+            if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    });
+}
+
+// ===== INTERSECTION OBSERVER =====
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ===== PARTICLES =====
+const particlesContainer = document.getElementById('particles');
+for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 100 + 30;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    particlesContainer.appendChild(p);
+}
+
+// ===== START COUNTERS ON LOAD =====
+window.addEventListener('load', () => {
+    setTimeout(animateCounters, 500);
+});
+</script>
+
+</body>
+</html>
