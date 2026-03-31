@@ -2,7 +2,7 @@
   "name": "Etruria B2B CRM",
   "short_name": "Etruria CRM",
   "description": "Gestão Profissional de Parceiros e-commerce Etruria",
-  "start_url": "./crm_ecommerce.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d1117",
   "theme_color": "#e94560",
